@@ -1,4 +1,4 @@
-import { useState, FormEvent, useEffect } from "react";
+import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 // import authApi from "@/api/auth.api";
 // import { useAuthContext } from "@/context/AuthContext
@@ -35,10 +35,10 @@ export default function LoginPage() {
       };
       setUser(userData);
       const destination =
-        response.user.role === "client"
+        response.user.role === "player"
           ? "/welcome-player"
           : response.user.role === "owner"
-            ? "/welcome-owner"
+            ? "/owner"
             : "/";
       // Navigate based on role
       navigate(destination, { replace: true });

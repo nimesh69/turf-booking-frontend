@@ -21,6 +21,14 @@ import PlayerProfilePage from '@/pages/PlayerProfilePage';
 import OwnerDashboardPage from '@/pages/OwnerDashboardPage';
 import SettingsPage from '@/pages/SettingsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+
+// Owner pages
+import OwnerAnalytics from '@/features/owner/pages/Analytics';
+import OwnerBookings from '@/features/owner/pages/Bookings';
+import OwnerChat from '@/features/owner/pages/Chat';
+import OwnerFinance from '@/features/owner/pages/Finance';
+import OwnerMyVenues from '@/features/owner/pages/MyVenues';
+import OwnerSettings from '@/features/owner/pages/Settings';
 export default function AppRoutes() {
   return (
     <Routes>
@@ -55,10 +63,16 @@ export default function AppRoutes() {
         </Route>
       </Route>
 
-      {/* Owner dashboard */}
+      {/* Owner dashboard - only accessible by owners */}
       <Route element={<OwnerRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path="/owner" element={<OwnerDashboardPage />} />
+          <Route path="/owner/analytics" element={<OwnerAnalytics />} />
+          <Route path="/owner/bookings" element={<OwnerBookings />} />
+          <Route path="/owner/chat" element={<OwnerChat />} />
+          <Route path="/owner/finance" element={<OwnerFinance />} />
+          <Route path="/owner/venues" element={<OwnerMyVenues />} />
+          <Route path="/owner/settings" element={<OwnerSettings />} />
         </Route>
       </Route>
 
