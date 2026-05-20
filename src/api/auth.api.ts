@@ -15,15 +15,19 @@ const authApi = {
   },
 
   // No refreshToken param needed — cookie sent automatically
-  logout: async () => {
-    try {
-      await axiosInstance.post(`${url}/logout/`);
-      return { success: true };
-    } catch (error) {
-      console.error('Logout error:', error);
-      throw error.response?.data || { error: error.message };
+logout: async () => {
+  try {
+    await axiosInstance.post(`${url}/logout/`);
+    return { success: true };
+  } catch (error) {
+    // 401 = token already expired/invalid, user is logged out server-side
+    if (error.response?.status === 401) {
+      return { success: true }; // treat as success
     }
-  },
+    console.error('Logout error:', error);
+    throw error.response?.data || { error: error.message };
+  }
+},
 
   signup: async (formData: SignupCredentials): Promise<AuthResponse> => {
     console.log('Signup formData:', formData);

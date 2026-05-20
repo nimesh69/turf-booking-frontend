@@ -31,7 +31,7 @@ axiosInstance.interceptors.request.use(
 
 // ─── Response interceptor ──────────────────────────────────────────────────
 interface QueueItem {
-  resolve: () => void;
+  resolve: (value?: unknown) => void;
   reject: (error: unknown) => void;
 }
 let isRefreshing = false;
@@ -48,7 +48,6 @@ const AUTH_SKIP_URLS = [
   "/api/auth/login/",
   "/api/auth/signup/",
   "/api/auth/refresh/",
-  "/api/auth/logout/",
 ];
 
 axiosInstance.interceptors.response.use(
@@ -64,21 +63,20 @@ axiosInstance.interceptors.response.use(
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
-        return new Promise((resolve, reject) =>
-          failedQueue.push({ resolve, reject }),
-        ).then(() => axiosInstance(originalRequest));
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        }).then(() => axiosInstance(originalRequest)); // 
       }
-
       originalRequest._retry = true;
       isRefreshing = true;
 
       try {
-        await axiosInstance.post("/api/auth/refresh/"); // ✅ correct URL
+        await axiosInstance.post("/api/auth/refresh/"); 
         processQueue(null);
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError);
-        window.location.href = "/login"; // ✅ redirect to login not "/"
+        window.location.href = "/login"; 
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;

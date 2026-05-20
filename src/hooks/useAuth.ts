@@ -20,7 +20,7 @@ export const useAuth = () => {
 
   const logout = async () => {
     try { await authApi.logout(); } catch {}
-    setUser(null);
+    // setUser(null);
   };
 
   return { user, isAuthenticated, login, signup, logout };

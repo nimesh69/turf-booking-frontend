@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuthContext } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function Settings() {
   const { user, setUser } = useAuthContext();
@@ -8,6 +9,7 @@ export default function Settings() {
     email: user?.email || '',
     phone: user?.phone || '',
   });
+  const { logout } = useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -19,10 +21,16 @@ export default function Settings() {
     alert('Settings saved (static view)');
   };
 
-  const handleLogout = () => {
+const handleLogout = async () => {
+  try {
+    await logout();
+  } catch (error) {
+    console.error(error);
+  } finally {
     setUser(null);
     window.location.href = '/login';
-  };
+  }
+};
 
   return (
     <div className="space-y-6">
