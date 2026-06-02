@@ -152,7 +152,7 @@ export interface TurfListItem extends BaseModel {
 }
 
 export interface TurfCreate {
-  venue: string;
+  venue?: string;
   sport: Sport;
   name: string;
   description?: string;
