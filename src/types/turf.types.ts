@@ -27,10 +27,16 @@ interface BaseModel {
 
 export interface VenueAmenities {
   parking?: boolean;
-  lights?: boolean;
   washroom?: boolean;
-  changingRoom?: boolean;
+  showers?: boolean;
+  changing_room?: boolean;
   cafeteria?: boolean;
+  wifi?:boolean;
+  spectator_area?:boolean;
+  swimming_pool?:boolean;
+  flood_light?:boolean;
+  cctv?:boolean;
+  drinking_water?:boolean;
   [key: string]: boolean | undefined; // extensible JSONField
 }
 
@@ -122,13 +128,13 @@ export interface Turf extends BaseModel {
   sport: Sport;
   name: string;
   description: string;
-  pricePerHour: string;   // DecimalField → string from DRF
-  maxPlayers: number;
-  courtCount: number;
-  openingTime: string;    // "HH:MM:SS"
-  closingTime: string;
-  avgRating: string;      // DecimalField → string from DRF
-  totalReviews: number;   // annotated
+  price_per_hour: string;   // DecimalField → string from DRF
+  max_players: number;
+  court_count: number;
+  opening_time: string;    // "HH:MM:SS"
+  closing_time: string;
+  avg_rating: string;      // DecimalField → string from DRF
+  total_reviews: number;   // annotated
   status: TurfStatus;
   deletedAt: string | null;
   images: TurfImage[];    // no isCover anymore — use order=0 for cover
@@ -140,37 +146,37 @@ export interface TurfListItem extends BaseModel {
   venueLocation: string;
   sport: Sport;
   name: string;
-  pricePerHour: string;
-  maxPlayers: number;
-  courtCount: number;
-  openingTime: string;
-  closingTime: string;
-  avgRating: string;
-  totalReviews: number;
+  price_per_hour: string;
+  max_players: number;
+  court_count: number;
+  opening_time: string;
+  closing_time: string;
+  avg_rating: string;
+  total_reviews: number;
   status: TurfStatus;
   coverImage: string | null; // first image by order, flattened
 }
 
 export interface TurfCreate {
-  venue: string;
+  venue?: string;
   sport: Sport;
   name: string;
   description?: string;
-  pricePerHour: number;
-  maxPlayers: number;
-  courtCount?: number;
-  openingTime: string;
-  closingTime: string;
+  price_per_hour: number;
+  max_players: number;
+  court_count?: number;
+  opening_time: string;
+  closing_time: string;
 }
 
 export interface TurfUpdate {
   name?: string;
   description?: string;
-  pricePerHour?: number;
-  maxPlayers?: number;
-  courtCount?: number;
-  openingTime?: string;
-  closingTime?: string;
+  price_per_hour?: number;
+  max_players?: number;
+  court_count?: number;
+  opening_time?: string;
+  closing_time?: string;
   status?: TurfStatus;
 }
 

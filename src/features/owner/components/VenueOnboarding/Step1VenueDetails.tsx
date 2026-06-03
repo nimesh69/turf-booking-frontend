@@ -23,7 +23,7 @@ export interface VenueDetailsData {
   venueName: string;
   location: string;
   address: string;
-  cover_image: File | null;
+  venue_cover: File | null;
   amenities: string[];
 }
 
@@ -31,7 +31,7 @@ export default function Step1VenueDetails({ onNext, onCancel }: Step1Props) {
   const [formData, setFormData] = useState<VenueDetailsData>({
     venueName: "",
     location: "",
-    cover_image: null as File | null,
+    venue_cover: null as File | null,
     address: "",
     amenities: [],
   });
@@ -39,12 +39,13 @@ export default function Step1VenueDetails({ onNext, onCancel }: Step1Props) {
   const amenitiesOptions = [
     { icon: LuCircleParking, label: "Parking" },
     { icon: GiShower, label: "Showers" },
+    { icon: GiShower, label: "Change Rooms" },
+    { icon: GiShower, label: "Washrooms" },
     { icon: GiCoffeeCup, label: "Cafeteria" },
     { icon: GiWifiRouter, label: "WiFi" },
     { icon: FaPeopleRobbery, label: "Spectator Area" },
     { icon: GiPoolDive, label: "Swimming Pool" },
     { icon: GiWaterBottle, label: "Drinking Water" },
-    { icon: GiCoffeeCup, label: "Cafe/Snacks" },
     { icon: GiCctvCamera, label: "CCTV" },
     { icon: IoFlashlight, label: "FloodLight" },
   ];
@@ -147,11 +148,11 @@ export default function Step1VenueDetails({ onNext, onCancel }: Step1Props) {
               <div>
                 <ImageUpload
                   label="Cover Image"
-                  value={formData.cover_image}
+                  value={formData.venue_cover}
                   onChange={(file) =>
                     setFormData((prev) => ({
                       ...prev,
-                      cover_image: file,
+                      venue_cover: file,
                     }))
                   }
                 />

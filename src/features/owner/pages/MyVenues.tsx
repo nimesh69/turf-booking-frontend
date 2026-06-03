@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import VenueOnboarding from '../components/VenueOnboarding/VenueOnboarding';
 import { useOwnerVenues } from '../hooks/useTurfs';
-
 export default function MyVenues() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const { data: venues = [], isLoading, isError } = useOwnerVenues();
