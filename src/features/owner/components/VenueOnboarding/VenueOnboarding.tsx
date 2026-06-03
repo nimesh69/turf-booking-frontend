@@ -31,9 +31,16 @@ export interface OnboardingData {
 
 const amenityMap: Record<string, keyof VenueAmenities> = {
   Parking: "parking",
-  Showers: "washroom",
+  washroom: "washroom",
+  change_room: "change_room",
+  Showers: "Showers",
   Cafeteria: "cafeteria",
   WiFi: "wifi",
+  "Spectator Area": "spectator_area",
+  "Swimming Pool": "swimming_pool",
+  FloodLight: "flood_light",
+  CCTV: "cctv",
+  "Drinking Water": "drinking_water",
 };
 
 const sportMap: Record<string, Sport> = {
@@ -59,11 +66,11 @@ const buildTurfPayload = (court: Court): TurfCreate => ({
   sport: sportMap[court.sportType] ?? 'futsal',
   name: court.name,
   description: court.description,
-  pricePerHour: court.pricePerHour,
-  maxPlayers: court.maxPlayers,
-  courtCount: 1,
-  openingTime: toTime(court.openingTime),
-  closingTime: toTime(court.closingTime),
+  price_per_hour: court.pricePerHour,
+  max_players: court.maxPlayers,
+  court_count: 1,
+  opening_time: toTime(court.openingTime),
+  closing_time: toTime(court.closingTime),
 });
 
 const buildVerificationPayload = (
@@ -116,12 +123,16 @@ export default function VenueOnboarding({ onClose }: VenueOnboardingProps) {
           name: data.venueDetails.venueName,
           location: data.venueDetails.address || data.venueDetails.location,
           amenities: buildAmenities(data.venueDetails.amenities),
+          coverImage: data.venueDetails.venue_cover ?? undefined,
         },
         turfs: data.courts.courts.map((court) => buildTurfPayload(court)),
         // ↑ pass empty string for venueId — backend sets it, frontend no longer needs it
         turfImages,
       });
-
+      // const venueId = {
+      //   id: venue.venue_id,
+      // }
+      console.log("Venue created with ID:", venue.id);
       // Verification is separate — it's not part of the turf/venue atomicity concern
       await turfApi.submitVenueVerification(
         venue.id,

@@ -1,3 +1,4 @@
+import { getMediaUrl } from "@/lib/media";
 import axiosInstance from "./axios";
 import type {
   Sport,
@@ -110,7 +111,7 @@ const toVenue = (raw: RawVenue): Venue => ({
   location: raw.location,
   amenities: raw.amenities ?? {},
   status: raw.status,
-  coverImage: raw.cover_image ?? null,
+  coverImage: getMediaUrl(raw.cover_image) ?? null,
   turfs: raw.turfs?.map(toTurfListItem),
   deletedAt: raw.deleted_at ?? null,
   createdAt: raw.created_at,
@@ -123,7 +124,7 @@ const toVenueListItem = (raw: RawVenue): VenueListItem => ({
   name: raw.name,
   location: raw.location,
   status: raw.status,
-  coverImage: raw.cover_image ?? null,
+  coverImage: getMediaUrl(raw.cover_image) ?? null,
   turfCount: raw.turfs_count ?? raw.turfs?.length ?? 0,
   createdAt: raw.created_at,
   updatedAt: raw.updated_at ?? raw.created_at,
@@ -132,7 +133,7 @@ const toVenueListItem = (raw: RawVenue): VenueListItem => ({
 const toTurfImage = (raw: RawTurfImage, turfId = ""): TurfImage => ({
   id: raw.id,
   turf: raw.turf ?? turfId,
-  image: raw.image,
+  image: getMediaUrl(raw.image) ?? "",
   order: raw.order,
   createdAt: raw.created_at,
   updatedAt: raw.updated_at ?? raw.created_at,
@@ -152,15 +153,15 @@ const toTurfListItem = (raw: RawTurfListItem): TurfListItem => ({
   venueLocation: raw.venue_location ?? "",
   sport: raw.sport,
   name: raw.name,
-  pricePerHour: raw.price_per_hour,
-  maxPlayers: raw.max_players,
-  courtCount: raw.court_count ?? 1,
-  openingTime: raw.opening_time ?? "",
-  closingTime: raw.closing_time ?? "",
-  avgRating: raw.avg_rating,
-  totalReviews: raw.total_reviews ?? raw.reviews_count ?? 0,
+  price_per_hour: raw.price_per_hour,
+  max_players: raw.max_players,
+  court_count: raw.court_count ?? 1,
+  opening_time: raw.opening_time ?? "",
+  closing_time: raw.closing_time ?? "",
+  avg_rating: raw.avg_rating,
+  total_reviews: raw.total_reviews ?? raw.reviews_count ?? 0,
   status: raw.status,
-  coverImage: coverImageUrl(raw.cover_image),
+  coverImage: getMediaUrl(coverImageUrl(raw.cover_image)),
   createdAt: raw.created_at,
   updatedAt: raw.updated_at ?? raw.created_at,
 });
@@ -214,11 +215,11 @@ const turfPayload = (data: TurfCreate | TurfUpdate) => ({
   sport: "sport" in data ? data.sport : undefined,
   name: data.name,
   description: data.description,
-  price_per_hour: data.pricePerHour,
-  max_players: data.maxPlayers,
-  court_count: data.courtCount,
-  opening_time: data.openingTime,
-  closing_time: data.closingTime,
+  price_per_hour: data.price_per_hour,
+  max_players: data.max_players,
+  court_count: data.court_count,
+  opening_time: data.opening_time,
+  closing_time: data.closing_time,
   status: "status" in data ? data.status : undefined,
 });
 
@@ -294,7 +295,7 @@ export const turfApi = {
       formData,
       { headers: { "Content-Type": "multipart/form-data" } },
     );
-    return toVenue(response.data);
+    return { id: response.data.id };
   },
   updateVenue: async (id: string, data: VenueUpdate) => {
     const response = await axiosInstance.patch<RawVenue>(
