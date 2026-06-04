@@ -1,5 +1,6 @@
 import { getMediaUrl } from "@/lib/media";
-import axiosInstance from "./axios";
+import  axiosInstance from "./axios";
+import axios from "./axios";
 import type {
   Sport,
   TimeSlot,
@@ -263,6 +264,12 @@ export const turfApi = {
       venuePayload(data),
     );
     return toVenue(response.data);
+  },
+  checkVenueVerificationStatus: async (venueId: string) => {
+      const { data } = await axiosInstance.get<RawVenueVerification>(
+        `${venuesUrl}${venueId}/verification/`,
+      );
+      return toVenueVerification(data, venueId);
   },
   createFullVenue: async (data: {
     venue: VenueCreate;

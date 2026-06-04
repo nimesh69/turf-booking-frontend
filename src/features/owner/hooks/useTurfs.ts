@@ -30,5 +30,15 @@ export function useOwnerVenues() {
   return useQuery({
     queryKey: venueQueryKeys.owner(),
     queryFn: turfApi.listOwnerVenues,
+    staleTime: Infinity,
+  });
+}
+
+export function useVenueVerification(venueId: string) {
+  return useQuery({
+    queryKey: venueQueryKeys.verification(venueId),
+    queryFn: () => turfApi.checkVenueVerificationStatus(venueId),
+    enabled: !!venueId,
+    staleTime: Infinity,
   });
 }
