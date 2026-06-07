@@ -60,6 +60,7 @@ export interface VenueListItem extends BaseModel {
   name: string;
   location: string;
   status: VenueStatus;
+  amenities: VenueAmenities;
   coverImage: string | null;
   turfCount: number;
 }

@@ -125,6 +125,7 @@ const toVenueListItem = (raw: RawVenue): VenueListItem => ({
   name: raw.name,
   location: raw.location,
   status: raw.status,
+  amenities: raw.amenities ?? {},
   coverImage: getMediaUrl(raw.cover_image) ?? null,
   turfCount: raw.turfs_count ?? raw.turfs?.length ?? 0,
   createdAt: raw.created_at,
