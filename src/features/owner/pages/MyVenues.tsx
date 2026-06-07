@@ -1,16 +1,22 @@
 import { useCallback, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import VenueOnboarding from "../components/VenueOnboarding/VenueOnboarding";
 import { useOwnerVenues, useVenueVerification } from "../hooks/useTurfs";
+import { turfApi } from "@/api/turf.api";
 import type {
   VenueListItem,
+  VenueUpdate,
 } from "@/types/turf.types"; // adjust import path
-// import type { VenueVerification } from "../types"; // adjust import path
 import { VerificationModal } from "../modals/verificationModal";
+import { VenueEditModal } from "../modals/venueEditModal";
+import { venueQueryKeys } from "../hooks/useTurfs";
 
 
 function VenueCard({ venue }: { venue: VenueListItem }) {
   const [canRecheck, setCanRecheck] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  const [showVerificationModal, setShowVerificationModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const queryClient = useQueryClient();
 
   const {
     data: verificationStatus,
@@ -18,23 +24,48 @@ function VenueCard({ venue }: { venue: VenueListItem }) {
     isFetching,
   } = useVenueVerification(venue.id);
 
+const updateVenueMutation = useMutation({
+  mutationFn: async (data: {
+    name: string;
+    location: string;
+    amenities: Record<string, boolean>; // ✅ was string[]
+    coverImage?: File;
+  }) => {
+    const updateData: VenueUpdate = {
+      name: data.name,
+      location: data.location,
+      amenities: data.amenities, // ✅ already correct format, no conversion needed
+      ...(data.coverImage && { coverImage: data.coverImage }),
+    };
+    return turfApi.updateVenue(venue.id, updateData);
+  },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: venueQueryKeys.all });
+      setShowEditModal(false);
+      alert("Venue updated successfully!");
+    },
+    onError: (error: Error) => {
+      alert(`Failed to update venue: ${error.message}`);
+    },
+  });
+
   const handleCheckVerification = useCallback(() => {
     if (isFetching) return;
 
     // if already verified, no point re-checking — just show modal
     if (verificationStatus?.verified) {
-      setShowModal(true);
+      setShowVerificationModal(true);
       return;
     }
 
     // not verified: show cached result if checked recently
     if (verificationStatus && !canRecheck) {
-      setShowModal(true);
+      setShowVerificationModal(true);
       return;
     }
 
     setCanRecheck(false);
-    refetch().then(() => setShowModal(true));
+    refetch().then(() => setShowVerificationModal(true));
     setTimeout(() => setCanRecheck(true), 2 * 60 * 1000);
   }, [canRecheck, isFetching, verificationStatus, refetch]);
 
@@ -46,9 +77,10 @@ function VenueCard({ venue }: { venue: VenueListItem }) {
       : "Check Verification";
 
   // only show "View Status" button if not verified and checked recently
-  const showButton = verificationStatus?.verified
+  const showCheckButton = verificationStatus?.verified
     ? false // hide button entirely if verified
     : true;
+  const showEditButton = verificationStatus?.verified === true;
 
   return (
     <>
@@ -70,7 +102,7 @@ function VenueCard({ venue }: { venue: VenueListItem }) {
                   : "bg-red-500/30 text-white"
               }`}
             >
-              {verificationStatus.verified ? "✓ Verified on" : "✗ Unverified"}
+              {verificationStatus.verified ? "✓ Verified on" : "Under Review"}
               <span>
                 {verificationStatus.verifiedAt &&
                   new Date(verificationStatus.verifiedAt).toLocaleDateString()}
@@ -83,14 +115,22 @@ function VenueCard({ venue }: { venue: VenueListItem }) {
           <h3 className="text-lg font-semibold text-gray-900 mb-2">
             {venue.name}
           </h3>
-          <p className="text-gray-600 text-sm mb-4">{venue.location}</p>
+          <span className="text-sm font-medium text-gray-500 mb-1">
+            Status: {venue.status}
+          </span>
+          <p className="text-gray-600 text-sm mb-4">Location: {venue.location}</p>
           <p className="text-gray-500 text-xs mb-4">{venue.turfCount} courts</p>
 
           <div className="flex gap-2">
-            <button className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 text-sm font-medium">
-              Edit
-            </button>
-            {showButton && (
+            {showEditButton && (
+              <button
+                onClick={() => setShowEditModal(true)}
+                className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 text-sm font-medium"
+              >
+                Edit
+              </button>
+            )}
+            {showCheckButton && (
               <button
                 onClick={handleCheckVerification}
                 disabled={isFetching}
@@ -106,10 +146,22 @@ function VenueCard({ venue }: { venue: VenueListItem }) {
         </div>
       </div>
 
-      {showModal && verificationStatus && (
+      {showEditModal && (
+        <VenueEditModal
+          venue={venue}
+          onSubmit={(data) => {
+            updateVenueMutation.mutate(data);
+          }}
+          onCancel={() => setShowEditModal(false)}
+          isLoading={updateVenueMutation.isPending}
+        />
+      )}
+
+      {showVerificationModal && verificationStatus && (
         <VerificationModal
           status={verificationStatus}
-          onClose={() => setShowModal(false)}
+          onClose={() => setShowVerificationModal(false)}
+          onRefresh={() => refetch()}
         />
       )}
     </>

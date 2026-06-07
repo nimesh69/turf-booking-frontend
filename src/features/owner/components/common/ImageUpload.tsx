@@ -3,6 +3,7 @@ type ImageUploadProps = {
   value: File | null;
   onChange: (file: File | null) => void;
   maxSizeMB?: number;
+  disabled?: boolean;
 };
 
 export default function ImageUpload({
@@ -10,6 +11,7 @@ export default function ImageUpload({
   value,
   onChange,
   maxSizeMB = 5,
+  disabled = false,
 }: ImageUploadProps) {
   const handleFileChange = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -38,6 +40,8 @@ export default function ImageUpload({
         type="file"
         accept="image/*"
         onChange={handleFileChange}
+        disabled={disabled}
+        className="disabled:opacity-50 disabled:cursor-not-allowed"
       />
 
       {value && (
