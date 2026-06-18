@@ -29,6 +29,7 @@ import OwnerChat from '@/features/owner/pages/Chat';
 import OwnerFinance from '@/features/owner/pages/Finance';
 import OwnerMyVenues from '@/features/owner/pages/MyVenues';
 import OwnerSettings from '@/features/owner/pages/Settings';
+import TurfList from '@/features/owner/pages/turflist';
 export default function AppRoutes() {
   return (
     <Routes>
@@ -72,6 +73,7 @@ export default function AppRoutes() {
           <Route path="/owner/chat" element={<OwnerChat />} />
           <Route path="/owner/finance" element={<OwnerFinance />} />
           <Route path="/owner/venues" element={<OwnerMyVenues />} />
+          <Route path="/owner/turfs/:venueId" element={<TurfList />} />
           <Route path="/owner/settings" element={<OwnerSettings />} />
         </Route>
       </Route>

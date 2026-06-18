@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import VenueOnboarding from "../components/VenueOnboarding/VenueOnboarding";
 import { useOwnerVenues, useVenueVerification } from "../hooks/useTurfs";
 import { turfApi } from "@/api/turf.api";
@@ -13,6 +14,7 @@ import { venueQueryKeys } from "../hooks/useTurfs";
 
 
 function VenueCard({ venue }: { venue: VenueListItem }) {
+  const navigate = useNavigate();
   const [canRecheck, setCanRecheck] = useState(true);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -84,8 +86,8 @@ const updateVenueMutation = useMutation({
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition">
-        <div className="h-48 bg-gray-200 relative">
+      <div className="bg-white rounded-lg shadow overflow-hidden " >
+        <div className="h-48 bg-gray-200 relative hover:shadow-lg transition cursor-pointer" onClick={() => navigate(`/owner/turfs/${venue.id}`)}>
           {venue.coverImage && (
             <img
               src={venue.coverImage}
@@ -112,7 +114,10 @@ const updateVenueMutation = useMutation({
         </div>
 
         <div className="p-4">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <h3 
+            className="text-lg font-semibold text-gray-900 mb-2 cursor-pointer hover:text-blue-600 transition"
+            onClick={() => navigate(`/owner/turfs/${venue.id}`)}
+          >
             {venue.name}
           </h3>
           <span className="text-sm font-medium text-gray-500 mb-1">
