@@ -10,7 +10,6 @@ interface Step1Props {
 export interface VenueDetailsData {
   venueName: string;
   location: string;
-  address: string;
   venue_cover: File | null;
   amenities: string[];
 }
@@ -23,7 +22,6 @@ export default function Step1VenueDetails({ onNext, onCancel }: Step1Props) {
     onNext({
       venueName: formData.name,
       location: formData.location,
-      address: formData.address,
       venue_cover: formData.coverImage,
       amenities: formData.amenities,
     });

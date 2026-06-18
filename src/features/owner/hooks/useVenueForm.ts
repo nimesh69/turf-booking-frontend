@@ -65,7 +65,6 @@ export function amenityLabelsToObject(
 export interface VenueFormState {
   name: string;
   location: string;
-  address: string;
   coverImage: File | null;
   amenities: string[]; // array of display labels
 }
@@ -78,7 +77,6 @@ export function useVenueForm({ initialValues = {} }: UseVenueFormOptions = {}) {
   const [formData, setFormData] = useState<VenueFormState>({
     name: initialValues.name ?? "",
     location: initialValues.location ?? "",
-    address: initialValues.address ?? "",
     coverImage: initialValues.coverImage ?? null,
     amenities: initialValues.amenities ?? [],
   });
@@ -96,8 +94,8 @@ export function useVenueForm({ initialValues = {} }: UseVenueFormOptions = {}) {
         : [...prev.amenities, label],
     }));
 
-  const isValid = (requireAddress = false) =>
-    Boolean(formData.name && formData.location && (!requireAddress || formData.address));
+  const isValid = () =>
+    Boolean(formData.name && formData.location && formData.coverImage && formData.amenities.length > 0  );
 
   return { formData, setField, toggleAmenity, isValid };
 }

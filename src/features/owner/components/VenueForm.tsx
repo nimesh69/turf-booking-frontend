@@ -19,7 +19,7 @@ export function VenueFormFields({
   formData,
   onFieldChange,
   onToggleAmenity,
-  // showAddress = false,
+  showAddress = false,
   disabled = false,
 }: VenueFormFieldsProps) {
   const inputClass =
