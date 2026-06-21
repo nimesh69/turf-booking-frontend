@@ -1,16 +1,30 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { turfApi } from "@/api/turf.api";
 import type { TurfListItem } from "@/types/turf.types";
+import CourtModal, { type CourtFormData } from "../components/CourtModal";
 
 export default function TurfList() {
   const { venueId } = useParams<{ venueId: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  // Fetch venue and its turfs
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState<CourtFormData>({
+    sportType: "Futsal",
+    openingTime: "06:00",
+    closingTime: "22:00",
+  });
+
+  const sportOptions = [
+    "Futsal", "Basketball", "Tennis", "Badminton",
+    "Cricket", "Volleyball", "Pickleball", "Table Tennis",
+  ];
+
   const {
-    data: venue, // rename directly in destructuring
+    data: venue,
     isLoading,
     error,
   } = useQuery({
@@ -21,7 +35,51 @@ export default function TurfList() {
     },
     enabled: !!venueId,
   });
-  console.log("venue data", venue?.turfs);
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: CourtFormData }) =>
+      turfApi.updateTurf(id, {
+        name: data.name ?? "",
+        // sport: data.sportType,
+        description: data.description ?? "",
+        price_per_hour: data.pricePerHour ?? 0,
+        max_players: data.maxPlayers ?? 0,
+        opening_time: data.openingTime ?? "06:00",
+        closing_time: data.closingTime ?? "22:00",
+        status: data.status ?? "active",
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["venue", venueId] });
+      handleClose();
+    },
+  });
+
+  const handleEdit = (turf: TurfListItem) => {
+    setFormData({
+      sportType: turf.sport,
+      name: turf.name,
+      description: turf.description ?? "",
+      pricePerHour: parseFloat(turf.price_per_hour?.toString() ?? "0"),
+      maxPlayers: turf.max_players,
+      openingTime: turf.opening_time ?? "",
+      closingTime: turf.closing_time ?? "",
+      status: turf.status,
+    });
+    setEditingId(turf.id.toString());
+    setShowModal(true);
+  };
+
+  const handleClose = () => {
+    setShowModal(false);
+    setEditingId(null);
+    setFormData({ sportType: "Futsal", openingTime: "06:00", closingTime: "22:00" });
+  };
+
+  const handleSubmit = () => {
+    if (!editingId) return;
+    updateMutation.mutate({ id: editingId, data: formData });
+  };
+
   if (!venueId) {
     return (
       <main className="flex-1 p-xl lg:px-xxl overflow-y-auto">
@@ -83,9 +141,7 @@ export default function TurfList() {
             >
               My Venues
             </span>
-            <span className="material-symbols-outlined text-[14px]">
-              chevron_right
-            </span>
+            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
             <span className="font-caption text-caption font-bold text-primary">
               {venue.name}
             </span>
@@ -102,47 +158,34 @@ export default function TurfList() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-xl mb-xxl">
         <div className="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant flex items-center gap-xl">
           <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-on-secondary-container">
-              check_circle
-            </span>
+            <span className="material-symbols-outlined text-on-secondary-container">check_circle</span>
           </div>
           <div>
-            <p className="font-caption text-caption text-on-surface-variant">
-              Active Courts
-            </p>
+            <p className="font-caption text-caption text-on-surface-variant">Active Courts</p>
             <p className="font-h2 text-h2 text-primary">{activeTurfs}</p>
           </div>
         </div>
         <div className="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant flex items-center gap-xl">
           <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-on-surface-variant">
-              build
-            </span>
+            <span className="material-symbols-outlined text-on-surface-variant">build</span>
           </div>
           <div>
-            <p className="font-caption text-caption text-on-surface-variant">
-              Under Maintenance/Inactive
-            </p>
+            <p className="font-caption text-caption text-on-surface-variant">Under Maintenance/Inactive</p>
             <p className="font-h2 text-h2 text-primary">{maintenanceTurfs}</p>
           </div>
         </div>
         <div className="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant flex items-center gap-xl">
           <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-on-secondary-container">
-              trending_up
-            </span>
+            <span className="material-symbols-outlined text-on-secondary-container">trending_up</span>
           </div>
           <div>
-            <p className="font-caption text-caption text-on-surface-variant">
-              Avg. Rating
-            </p>
+            <p className="font-caption text-caption text-on-surface-variant">Avg. Rating</p>
             <p className="font-h2 text-h2 text-primary">
               {turfs.length > 0
                 ? (
                     turfs.reduce(
                       (sum, t: TurfListItem) =>
-                        sum +
-                        (parseFloat(t.avg_rating?.toString() || "0") || 0),
+                        sum + (parseFloat(t.avg_rating?.toString() || "0") || 0),
                       0,
                     ) / turfs.length
                   ).toFixed(1)
@@ -156,12 +199,8 @@ export default function TurfList() {
       {turfs.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-12 text-center">
           <div className="text-5xl mb-4">🏟️</div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            No Courts Yet
-          </h3>
-          <p className="text-gray-600 mb-6">
-            Add your first court to start accepting bookings
-          </p>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">No Courts Yet</h3>
+          <p className="text-gray-600 mb-6">Add your first court to start accepting bookings</p>
           <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             Add Court
           </button>
@@ -202,50 +241,35 @@ export default function TurfList() {
                   <h3 className="font-h2 text-h2 text-primary">{turf.name}</h3>
                   <span className="font-h2 text-h2 text-secondary">
                     ₹{turf.price_per_hour}
-                    <span className="text-caption font-normal text-on-surface-variant">
-                      /hr
-                    </span>
+                    <span className="text-caption font-normal text-on-surface-variant">/hr</span>
                   </span>
                 </div>
                 <div className="space-y-sm mb-xl">
                   <div className="flex items-center gap-sm text-on-surface-variant">
-                    <span className="material-symbols-outlined text-[18px]">
-                      sports_soccer
-                    </span>
-                    <span className="font-body-sm text-body-sm capitalize">
-                      {turf.sport}
-                    </span>
+                    <span className="material-symbols-outlined text-[18px]">sports_soccer</span>
+                    <span className="font-body-sm text-body-sm capitalize">{turf.sport}</span>
                   </div>
                   <div className="flex items-center gap-sm text-on-surface-variant">
-                    <span className="material-symbols-outlined text-[18px]">
-                      groups
-                    </span>
-                    <span className="font-body-sm text-body-sm">
-                      Max {turf.max_players} Players
-                    </span>
+                    <span className="material-symbols-outlined text-[18px]">groups</span>
+                    <span className="font-body-sm text-body-sm">Max {turf.max_players} Players</span>
                   </div>
                   {turf.avg_rating && (
                     <div className="flex items-center gap-sm text-on-surface-variant">
-                      <span className="material-symbols-outlined text-[18px]">
-                        star
-                      </span>
-                      <span className="font-body-sm text-body-sm">
-                        {turf.avg_rating} Rating
-                      </span>
+                      <span className="material-symbols-outlined text-[18px]">star</span>
+                      <span className="font-body-sm text-body-sm">{turf.avg_rating} Rating</span>
                     </div>
                   )}
                 </div>
                 <div className="grid grid-cols-2 gap-md pt-lg border-t border-outline-variant">
-                  <button className="flex items-center justify-center gap-sm py-md rounded-lg border border-outline text-primary font-semibold hover:bg-surface-container-low transition-colors active:scale-95">
-                    <span className="material-symbols-outlined text-[18px]">
-                      edit
-                    </span>
+                  <button
+                    onClick={() => handleEdit(turf)}
+                    className="flex items-center justify-center gap-sm py-md rounded-lg border border-outline text-primary font-semibold hover:bg-surface-container-low transition-colors active:scale-95"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">edit</span>
                     Edit
                   </button>
                   <button className="flex items-center justify-center gap-sm py-md rounded-lg border border-error text-error font-semibold hover:bg-error-container transition-colors active:scale-95">
-                    <span className="material-symbols-outlined text-[18px]">
-                      delete
-                    </span>
+                    <span className="material-symbols-outlined text-[18px]">delete</span>
                     Delete
                   </button>
                 </div>
@@ -254,6 +278,16 @@ export default function TurfList() {
           ))}
         </div>
       )}
+
+      <CourtModal
+        showModal={showModal}
+        editingId={editingId}
+        formData={formData}
+        sportOptions={sportOptions}
+        onFormChange={setFormData}
+        onClose={handleClose}
+        onSubmit={handleSubmit}
+      />
     </main>
   );
 }

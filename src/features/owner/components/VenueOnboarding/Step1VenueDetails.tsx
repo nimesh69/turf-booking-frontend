@@ -18,7 +18,7 @@ export default function Step1VenueDetails({ onNext, onCancel }: Step1Props) {
   const { formData, setField, toggleAmenity, isValid } = useVenueForm();
 
   const handleNext = () => {
-    if (!isValid(true)) return; // requireAddress = true
+    if (!isValid()) return; // requireAddress = true
     onNext({
       venueName: formData.name,
       location: formData.location,
@@ -79,7 +79,7 @@ export default function Step1VenueDetails({ onNext, onCancel }: Step1Props) {
         </button>
         <button
           onClick={handleNext}
-          disabled={!isValid(true)}
+          disabled={!isValid()}
           className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 transition font-semibold flex items-center gap-2"
         >
           Next <GrFormNextLink />

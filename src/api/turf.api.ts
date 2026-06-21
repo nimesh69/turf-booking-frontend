@@ -1,6 +1,6 @@
 import { getMediaUrl } from "@/lib/media";
 import  axiosInstance from "./axios";
-import axios from "./axios";
+// import axios from "./axios";
 import type {
   Sport,
   TimeSlot,
@@ -59,6 +59,7 @@ type RawTurfListItem = {
   court_count?: number;
   opening_time?: string;
   closing_time?: string;
+  description?: string;
   avg_rating: string;
   total_reviews?: number;
   reviews_count?: number;
@@ -157,6 +158,7 @@ const toTurfListItem = (raw: RawTurfListItem): TurfListItem => ({
   name: raw.name,
   price_per_hour: raw.price_per_hour,
   max_players: raw.max_players,
+  description: raw.description ?? "",
   court_count: raw.court_count ?? 1,
   opening_time: raw.opening_time ?? "",
   closing_time: raw.closing_time ?? "",

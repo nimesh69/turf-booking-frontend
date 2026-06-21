@@ -121,7 +121,7 @@ export default function VenueOnboarding({ onClose }: VenueOnboardingProps) {
       const venue = await turfApi.createFullVenue({
         venue: {
           name: data.venueDetails.venueName,
-          location: data.venueDetails.address || data.venueDetails.location,
+          location: data.venueDetails.location,
           amenities: buildAmenities(data.venueDetails.amenities),
           coverImage: data.venueDetails.venue_cover ?? undefined,
         },
@@ -132,7 +132,7 @@ export default function VenueOnboarding({ onClose }: VenueOnboardingProps) {
       // const venueId = {
       //   id: venue.venue_id,
       // }
-      console.log("Venue created with ID:", venue.id);
+      // console.log("Venue created with ID:", venue.id);
       // Verification is separate — it's not part of the turf/venue atomicity concern
       await turfApi.submitVenueVerification(
         venue.id,
