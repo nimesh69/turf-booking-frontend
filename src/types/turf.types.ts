@@ -147,6 +147,7 @@ export interface TurfListItem extends BaseModel {
   venueLocation: string;
   sport: Sport;
   name: string;
+  description: string;
   price_per_hour: string;
   max_players: number;
   court_count: number;
