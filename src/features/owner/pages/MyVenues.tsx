@@ -190,9 +190,11 @@ export default function MyVenues() {
         </div>
         <button
           onClick={() => setShowOnboarding(true)}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="bg-primary text-on-primary px-xl py-lg rounded-xl flex items-center gap-sm font-semibold hover:opacity-90 transition-opacity active:scale-95"
         >
-          + Add New Venue
+          <span className="material-symbols-outlined">add</span>
+
+           Add New Venue
         </button>
       </div>
 

@@ -19,8 +19,14 @@ export default function TurfList() {
   });
 
   const sportOptions = [
-    "Futsal", "Basketball", "Tennis", "Badminton",
-    "Cricket", "Volleyball", "Pickleball", "Table Tennis",
+    "Futsal",
+    "Basketball",
+    "Tennis",
+    "Badminton",
+    "Cricket",
+    "Volleyball",
+    "Pickleball",
+    "Table Tennis",
   ];
 
   const {
@@ -33,6 +39,7 @@ export default function TurfList() {
       if (!venueId) throw new Error("Venue ID not provided");
       return turfApi.getVenue(venueId);
     },
+    staleTime: Infinity,
     enabled: !!venueId,
   });
 
@@ -72,7 +79,11 @@ export default function TurfList() {
   const handleClose = () => {
     setShowModal(false);
     setEditingId(null);
-    setFormData({ sportType: "Futsal", openingTime: "06:00", closingTime: "22:00" });
+    setFormData({
+      sportType: "Futsal",
+      openingTime: "06:00",
+      closingTime: "22:00",
+    });
   };
 
   const handleSubmit = () => {
@@ -141,7 +152,9 @@ export default function TurfList() {
             >
               My Venues
             </span>
-            <span className="material-symbols-outlined text-[14px]">chevron_right</span>
+            <span className="material-symbols-outlined text-[14px]">
+              chevron_right
+            </span>
             <span className="font-caption text-caption font-bold text-primary">
               {venue.name}
             </span>
@@ -150,7 +163,7 @@ export default function TurfList() {
         </div>
         <button className="bg-primary text-on-primary px-xl py-lg rounded-xl flex items-center gap-sm font-semibold hover:opacity-90 transition-opacity active:scale-95">
           <span className="material-symbols-outlined">add</span>
-          Add New Court
+          Add New Truf
         </button>
       </div>
 
@@ -158,34 +171,47 @@ export default function TurfList() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-xl mb-xxl">
         <div className="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant flex items-center gap-xl">
           <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-on-secondary-container">check_circle</span>
+            <span className="material-symbols-outlined text-on-secondary-container">
+              check_circle
+            </span>
           </div>
           <div>
-            <p className="font-caption text-caption text-on-surface-variant">Active Courts</p>
+            <p className="font-caption text-caption text-on-surface-variant">
+              Active Courts
+            </p>
             <p className="font-h2 text-h2 text-primary">{activeTurfs}</p>
           </div>
         </div>
         <div className="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant flex items-center gap-xl">
           <div className="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-on-surface-variant">build</span>
+            <span className="material-symbols-outlined text-on-surface-variant">
+              build
+            </span>
           </div>
           <div>
-            <p className="font-caption text-caption text-on-surface-variant">Under Maintenance/Inactive</p>
+            <p className="font-caption text-caption text-on-surface-variant">
+              Under Maintenance/Inactive
+            </p>
             <p className="font-h2 text-h2 text-primary">{maintenanceTurfs}</p>
           </div>
         </div>
         <div className="bg-surface-container-lowest p-xl rounded-xl border border-outline-variant flex items-center gap-xl">
           <div className="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-on-secondary-container">trending_up</span>
+            <span className="material-symbols-outlined text-on-secondary-container">
+              trending_up
+            </span>
           </div>
           <div>
-            <p className="font-caption text-caption text-on-surface-variant">Avg. Rating</p>
+            <p className="font-caption text-caption text-on-surface-variant">
+              Avg. Rating
+            </p>
             <p className="font-h2 text-h2 text-primary">
               {turfs.length > 0
                 ? (
                     turfs.reduce(
                       (sum, t: TurfListItem) =>
-                        sum + (parseFloat(t.avg_rating?.toString() || "0") || 0),
+                        sum +
+                        (parseFloat(t.avg_rating?.toString() || "0") || 0),
                       0,
                     ) / turfs.length
                   ).toFixed(1)
@@ -199,8 +225,12 @@ export default function TurfList() {
       {turfs.length === 0 ? (
         <div className="bg-white rounded-lg shadow p-12 text-center">
           <div className="text-5xl mb-4">🏟️</div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No Courts Yet</h3>
-          <p className="text-gray-600 mb-6">Add your first court to start accepting bookings</p>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            No Courts Yet
+          </h3>
+          <p className="text-gray-600 mb-6">
+            Add your first court to start accepting bookings
+          </p>
           <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             Add Court
           </button>
@@ -241,38 +271,66 @@ export default function TurfList() {
                   <h3 className="font-h2 text-h2 text-primary">{turf.name}</h3>
                   <span className="font-h2 text-h2 text-secondary">
                     ₹{turf.price_per_hour}
-                    <span className="text-caption font-normal text-on-surface-variant">/hr</span>
+                    <span className="text-caption font-normal text-on-surface-variant">
+                      /hr
+                    </span>
                   </span>
                 </div>
                 <div className="space-y-sm mb-xl">
                   <div className="flex items-center gap-sm text-on-surface-variant">
-                    <span className="material-symbols-outlined text-[18px]">sports_soccer</span>
-                    <span className="font-body-sm text-body-sm capitalize">{turf.sport}</span>
+                    <span className="material-symbols-outlined text-[18px]">
+                      sports_soccer
+                    </span>
+                    <span className="font-body-sm text-body-sm capitalize">
+                      {turf.sport}
+                    </span>
                   </div>
                   <div className="flex items-center gap-sm text-on-surface-variant">
-                    <span className="material-symbols-outlined text-[18px]">groups</span>
-                    <span className="font-body-sm text-body-sm">Max {turf.max_players} Players</span>
+                    <span className="material-symbols-outlined text-[18px]">
+                      groups
+                    </span>
+                    <span className="font-body-sm text-body-sm">
+                      Max {turf.max_players} Players
+                    </span>
                   </div>
                   {turf.avg_rating && (
                     <div className="flex items-center gap-sm text-on-surface-variant">
-                      <span className="material-symbols-outlined text-[18px]">star</span>
-                      <span className="font-body-sm text-body-sm">{turf.avg_rating} Rating</span>
+                      <span className="material-symbols-outlined text-[18px]">
+                        star
+                      </span>
+                      <span className="font-body-sm text-body-sm">
+                        {turf.avg_rating} Rating
+                      </span>
                     </div>
                   )}
                 </div>
-                <div className="grid grid-cols-2 gap-md pt-lg border-t border-outline-variant">
-                  <button
-                    onClick={() => handleEdit(turf)}
-                    className="flex items-center justify-center gap-sm py-md rounded-lg border border-outline text-primary font-semibold hover:bg-surface-container-low transition-colors active:scale-95"
-                  >
-                    <span className="material-symbols-outlined text-[18px]">edit</span>
-                    Edit
-                  </button>
-                  <button className="flex items-center justify-center gap-sm py-md rounded-lg border border-error text-error font-semibold hover:bg-error-container transition-colors active:scale-95">
-                    <span className="material-symbols-outlined text-[18px]">delete</span>
-                    Delete
-                  </button>
-                </div>
+                {turf.status === "suspended" || turf.status === "draft" ? (
+                  <div className="mb-xl">
+                    <p className="text-error font-semibold text-sm">
+                      {turf.status === "suspended"
+                        ? "This court is suspended. Please contact support for account activation."
+                        : "This court is in draft mode. It's under review and not visible to users."}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-md pt-lg border-t border-outline-variant">
+                    <button
+                      onClick={() => handleEdit(turf)}
+                      className="flex items-center justify-center gap-sm py-md rounded-lg border border-outline text-primary font-semibold hover:bg-surface-container-low transition-colors active:scale-95"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">
+                        edit
+                      </span>
+                      Edit
+                    </button>
+                    <button className="flex items-center justify-center gap-sm py-md rounded-lg border border-error text-error font-semibold hover:bg-error-container transition-colors active:scale-95">
+                      <span className="material-symbols-outlined text-[18px]">
+                        delete
+                      </span>
+                      Delete
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}

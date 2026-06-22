@@ -33,7 +33,7 @@ export default function CourtModal({
   onSubmit,
 }: CourtModalProps) {
   if (!showModal) return null;
-  // console.log('Rendering CourtModal with formData:', formData);
+  // console.log('Rendering CourtModal with formData:', editingId);
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center px-6">
       <div className="bg-white w-full max-w-2xl rounded-xl shadow-xl overflow-hidden">
