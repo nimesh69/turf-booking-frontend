@@ -25,14 +25,23 @@ export function VenueEditModal({
   onCancel,
   isLoading = false,
 }: VenueEditModalProps) {
+  // console.log("venueedit modal",venue)
   const { formData, setField, toggleAmenity, isValid } = useVenueForm({
+    mode: "edit",
     initialValues: {
       name: venue.name,
       location: venue.location,
       amenities: amenityObjectToLabels(venue.amenities),
     },
   });
+  const hasChanges =
+    formData.name !== venue.name ||
+    formData.location !== venue.location ||
+    JSON.stringify(formData.amenities.sort()) !==
+      JSON.stringify(amenityObjectToLabels(venue.amenities).sort()) ||
+    formData.coverImage;
 
+    // console.log("chsnges detected", hasChanges)
   const handleSubmit = () => {
     if (!isValid()) return;
     onSubmit({
@@ -42,7 +51,11 @@ export function VenueEditModal({
       coverImage: formData.coverImage ?? undefined,
     });
   };
-
+//   console.log({
+//   isValid: isValid(),
+//   hasChanges,
+//   disabled: !isValid() || !hasChanges || isLoading,
+// });
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
@@ -84,7 +97,7 @@ export function VenueEditModal({
           </button>
           <button
             onClick={handleSubmit}
-            disabled={!isValid() || isLoading}
+            disabled={!isValid() || !hasChanges || isLoading}
             className="flex items-center gap-2 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 transition font-semibold disabled:cursor-not-allowed"
           >
             {isLoading ? "Saving..." : "Save Changes"}

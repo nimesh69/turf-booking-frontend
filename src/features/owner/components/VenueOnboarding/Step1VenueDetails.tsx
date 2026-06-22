@@ -15,7 +15,15 @@ export interface VenueDetailsData {
 }
 
 export default function Step1VenueDetails({ onNext, onCancel }: Step1Props) {
-  const { formData, setField, toggleAmenity, isValid } = useVenueForm();
+  const { formData, setField, toggleAmenity, isValid } = useVenueForm({
+    mode: "create",
+    initialValues: {
+      name: "",
+      location: "",
+      coverImage: null,
+      amenities: [],
+    },
+  });
 
   const handleNext = () => {
     if (!isValid()) return; // requireAddress = true

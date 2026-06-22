@@ -42,7 +42,7 @@ export const AMENITY_KEY_TO_LABEL: Record<string, string> = {
 
 /** Convert a backend amenities object { cctv: true, wifi: false } → label array ["CCTV"] */
 export function amenityObjectToLabels(
-  amenities: Record<string, boolean | undefined> = {}
+  amenities: Record<string, boolean | undefined> = {},
 ): string[] {
   return Object.entries(amenities)
     .filter(([, enabled]) => enabled)
@@ -52,13 +52,13 @@ export function amenityObjectToLabels(
 
 /** Convert a label array ["CCTV", "WiFi"] → backend object { cctv: true, wifi: true, parking: false, ... } */
 export function amenityLabelsToObject(
-  labels: string[]
+  labels: string[],
 ): Record<string, boolean> {
   return Object.fromEntries(
     Object.entries(AMENITY_KEY_TO_LABEL).map(([apiKey, label]) => [
       apiKey,
       labels.includes(label),
-    ])
+    ]),
   );
 }
 
@@ -71,9 +71,13 @@ export interface VenueFormState {
 
 export interface UseVenueFormOptions {
   initialValues?: Partial<VenueFormState>;
+  mode?: "create" | "edit"; // determines validation rules
 }
 
-export function useVenueForm({ initialValues = {} }: UseVenueFormOptions = {}) {
+export function useVenueForm({
+  initialValues = {},
+  mode = "create",
+}: UseVenueFormOptions = {}) {
   const [formData, setFormData] = useState<VenueFormState>({
     name: initialValues.name ?? "",
     location: initialValues.location ?? "",
@@ -83,8 +87,13 @@ export function useVenueForm({ initialValues = {} }: UseVenueFormOptions = {}) {
 
   const setField = <K extends keyof VenueFormState>(
     key: K,
-    value: VenueFormState[K]
-  ) => setFormData((prev) => ({ ...prev, [key]: value }));
+    value: VenueFormState[K],
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
 
   const toggleAmenity = (label: string) =>
     setFormData((prev) => ({
@@ -94,8 +103,26 @@ export function useVenueForm({ initialValues = {} }: UseVenueFormOptions = {}) {
         : [...prev.amenities, label],
     }));
 
-  const isValid = () =>
-    Boolean(formData.name && formData.location && formData.coverImage && formData.amenities.length > 0  );
+  const isValid = () => {
+    if (mode === "create") {
+      return Boolean(
+        formData.name &&
+        formData.location &&
+        formData.coverImage &&
+        formData.amenities.length > 0,
+      );
+    }
 
-  return { formData, setField, toggleAmenity, isValid };
+    // edit
+    return Boolean(
+      formData.name && formData.location && formData.amenities.length > 0,
+    );
+  };
+
+  return {
+    formData,
+    setField,
+    toggleAmenity,
+    isValid,
+  };
 }

@@ -19,14 +19,13 @@ export function VenueFormFields({
   formData,
   onFieldChange,
   onToggleAmenity,
-  // showAddress = false,
   disabled = false,
 }: VenueFormFieldsProps) {
   const inputClass =
     "w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 " +
     "focus:border-blue-500 focus:outline-none transition-all " +
     "disabled:bg-gray-50 disabled:cursor-not-allowed";
-
+    // console.log("Rendering VenueFormFields with formData:", formData);
   return (
     <div className="space-y-6">
       {/* Venue Name */}
@@ -70,23 +69,6 @@ export function VenueFormFields({
           disabled={disabled}
         />
       </div>
-
-      {/* Full Address — creation only */}
-      {/* {showAddress && (
-        <div>
-          <label className="block font-semibold text-gray-900 mb-2">
-            Full Address
-          </label>
-          <input
-            type="text"
-            placeholder="Enter complete address"
-            value={formData.address}
-            onChange={(e) => onFieldChange("address", e.target.value)}
-            disabled={disabled}
-            className={inputClass}
-          />
-        </div>
-      )} */}
 
       {/* Amenities */}
       <div>
