@@ -9,13 +9,13 @@ import { VerificationModal } from "../modals/verificationModal";
 import { VenueEditModal } from "../modals/venueEditModal";
 import { venueQueryKeys } from "../hooks/useTurfs";
 import { VenueStatus } from "@/types/turf.types";
-// import { DeleteVenueModal } from "../modals/deletemodal"
+import  ConfirmDeleteModal  from "../modals/ConfirmDeleteModal";
 function VenueCard({ venue }: { venue: VenueListItem }) {
   const navigate = useNavigate();
   const [canRecheck, setCanRecheck] = useState(true);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  // const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const queryClient = useQueryClient();
 
   const {
@@ -155,9 +155,10 @@ function VenueCard({ venue }: { venue: VenueListItem }) {
                   {buttonLabel}
                 </button>
               )}
-              <button 
-              // onClick = {() => setShowDeleteModal(true)}
-              className="flex-1 px-3 py-2 bg-red-50 text-red-600 rounded hover:bg-red-100 text-sm font-medium">
+              <button
+                onClick={() => setShowDeleteModal(true)}
+                className="flex-1 px-3 py-2 bg-red-50 text-red-600 rounded hover:bg-red-100 text-sm font-medium"
+              >
                 Delete
               </button>
             </div>
@@ -174,21 +175,28 @@ function VenueCard({ venue }: { venue: VenueListItem }) {
           isLoading={updateVenueMutation.isPending}
         />
       )}
-      {/* {showDeleteModal && (
-        <DeleteVenueModal
-          // venue={venue}
-          // onCancel={() => setShowDeleteModal(false)}
-          // onDelete={() => {
-          //   turfApi.deleteVenue(venue.id).then(() => {
-          //     void queryClient.invalidateQueries({ queryKey: venueQueryKeys.all });
-          //     setShowDeleteModal(false);
-          //     alert("Venue deleted successfully!");
-          //   }).catch((error) => {
-          //     alert(`Failed to delete venue: ${error.message}`);
-          //   });
-          // }}
+      {showDeleteModal && (
+        <ConfirmDeleteModal
+          title="Delete Venue"
+          message="Are you sure you want to delete"
+          itemName={venue.name}
+          onCancel={() => setShowDeleteModal(false)}
+          onConfirm={() => {
+            turfApi
+              .deleteVenue(venue.id)
+              .then(() => {
+                void queryClient.invalidateQueries({
+                  queryKey: venueQueryKeys.all,
+                });
+                setShowDeleteModal(false);
+                alert("Venue deleted successfully!");
+              })
+              .catch((error) => {
+                alert(`Failed to delete venue: ${error.message}`);
+              });
+          }}
         />
-      )} */}
+      )}
       {showVerificationModal && verificationStatus && (
         <VerificationModal
           status={verificationStatus}

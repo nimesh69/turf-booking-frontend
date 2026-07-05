@@ -1,9 +1,11 @@
 import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { turfApi } from "@/api/turf.api";
 import type { TurfListItem } from "@/types/turf.types";
 import CourtModal, { type CourtFormData } from "../components/CourtModal";
+import ConfirmDeleteModal from "../modals/ConfirmDeleteModal";
+import { venueQueryKeys, useVenueDetail } from "../hooks/useTurfs";
 
 export default function TurfList() {
   const { venueId } = useParams<{ venueId: string }>();
@@ -17,6 +19,8 @@ export default function TurfList() {
     openingTime: "06:00",
     closingTime: "22:00",
   });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedTurf, setSelectedTurf] = useState<TurfListItem | null>(null);
   const initialFormDataRef = useRef<CourtFormData>({});
   const sportOptions = [
     "Futsal",
@@ -29,19 +33,7 @@ export default function TurfList() {
     "Table Tennis",
   ];
 
-  const {
-    data: venue,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["venue", venueId],
-    queryFn: async () => {
-      if (!venueId) throw new Error("Venue ID not provided");
-      return turfApi.getVenue(venueId);
-    },
-    staleTime: Infinity,
-    enabled: !!venueId,
-  });
+  const { data: venue, isLoading, error } = useVenueDetail(venueId ?? "");
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: CourtFormData }) =>
@@ -61,24 +53,28 @@ export default function TurfList() {
     },
   });
 
-const handleEdit = (turf: TurfListItem) => {
-  const data: CourtFormData = {
-    sportType: turf.sport,
-    name: turf.name,
-    description: turf.description ?? "",
-    pricePerHour: parseFloat(turf.price_per_hour?.toString() ?? "0"),
-    maxPlayers: turf.max_players,
-    openingTime: turf.opening_time ?? "",
-    closingTime: turf.closing_time ?? "",
-    status: turf.status,
+  const handleEdit = (turf: TurfListItem) => {
+    const data: CourtFormData = {
+      sportType: turf.sport,
+      name: turf.name,
+      description: turf.description ?? "",
+      pricePerHour: parseFloat(turf.price_per_hour?.toString() ?? "0"),
+      maxPlayers: turf.max_players,
+      openingTime: turf.opening_time ?? "",
+      closingTime: turf.closing_time ?? "",
+      status: turf.status,
+    };
+    initialFormDataRef.current = data; // sync, before re-render
+    setFormData(data);
+    setEditingId(turf.id.toString());
+    setShowModal(true);
   };
-  initialFormDataRef.current = data;  // sync, before re-render
-  setFormData(data);
-  setEditingId(turf.id.toString());
-  setShowModal(true);
-};
+  const handleDelete = (turf: TurfListItem) => {
+    setSelectedTurf(turf);
+    setShowDeleteModal(true);
+  };
   // console.log('initialFormData:', JSON.stringify(initialFormData));
-// console.log('formData:', JSON.stringify(formData));
+  // console.log('formData:', JSON.stringify(formData));
   const handleClose = () => {
     setShowModal(false);
     setEditingId(null);
@@ -326,7 +322,10 @@ const handleEdit = (turf: TurfListItem) => {
                       </span>
                       Edit
                     </button>
-                    <button className="flex items-center justify-center gap-sm py-md rounded-lg border border-error text-error font-semibold hover:bg-error-container transition-colors active:scale-95">
+                    <button
+                      onClick={() => handleDelete(turf)}
+                      className="flex items-center justify-center gap-sm py-md rounded-lg border border-error text-error font-semibold hover:bg-error-container transition-colors active:scale-95"
+                    >
                       <span className="material-symbols-outlined text-[18px]">
                         delete
                       </span>
@@ -342,7 +341,7 @@ const handleEdit = (turf: TurfListItem) => {
 
       <CourtModal
         showModal={showModal}
-        key={editingId ?? 'new'}
+        key={editingId ?? "new"}
         editingId={editingId}
         formData={formData}
         initialFormData={formData}
@@ -351,6 +350,30 @@ const handleEdit = (turf: TurfListItem) => {
         onClose={handleClose}
         onSubmit={handleSubmit}
       />
+      {showDeleteModal && (
+        <ConfirmDeleteModal
+          title="Delete Turf"
+          message="Are you sure you want to delete"
+          itemName={setSelectedTurf?.name}
+          onCancel={() => setShowDeleteModal(false)}
+          onConfirm={() => {
+            if (!selectedTurf) return; // guards both TS and runtime
+
+            turfApi
+              .deleteTurf(selectedTurf.id.toString()) // now narrowed to `string`
+              .then(() => {
+                void queryClient.invalidateQueries({
+                  queryKey: venueQueryKeys.detail(venueId),
+                });
+                setShowDeleteModal(false);
+                alert("Turf deleted successfully!");
+              })
+              .catch((error) => {
+                alert(`Failed to delete Turf: ${error.message}`);
+              });
+          }}
+        />
+      )}
     </main>
   );
 }
