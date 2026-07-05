@@ -4,20 +4,18 @@ import { useNavigate } from "react-router-dom";
 import VenueOnboarding from "../components/VenueOnboarding/VenueOnboarding";
 import { useOwnerVenues, useVenueVerification } from "../hooks/useTurfs";
 import { turfApi } from "@/api/turf.api";
-import type {
-  VenueListItem,
-  VenueUpdate,
-} from "@/types/turf.types"; // adjust import path
+import type { VenueListItem, VenueUpdate } from "@/types/turf.types"; // adjust import path
 import { VerificationModal } from "../modals/verificationModal";
 import { VenueEditModal } from "../modals/venueEditModal";
 import { venueQueryKeys } from "../hooks/useTurfs";
-
-
+import { VenueStatus } from "@/types/turf.types";
+// import { DeleteVenueModal } from "../modals/deletemodal"
 function VenueCard({ venue }: { venue: VenueListItem }) {
   const navigate = useNavigate();
   const [canRecheck, setCanRecheck] = useState(true);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  // const [showDeleteModal, setShowDeleteModal] = useState(false);
   const queryClient = useQueryClient();
 
   const {
@@ -26,21 +24,24 @@ function VenueCard({ venue }: { venue: VenueListItem }) {
     isFetching,
   } = useVenueVerification(venue.id);
 
-const updateVenueMutation = useMutation({
-  mutationFn: async (data: {
-    name: string;
-    location: string;
-    amenities: Record<string, boolean>; // ✅ was string[]
-    coverImage?: File;
-  }) => {
-    const updateData: VenueUpdate = {
-      name: data.name,
-      location: data.location,
-      amenities: data.amenities, // ✅ already correct format, no conversion needed
-      ...(data.coverImage && { coverImage: data.coverImage }),
-    };
-    return turfApi.updateVenue(venue.id, updateData);
-  },
+  const updateVenueMutation = useMutation({
+    mutationFn: async (data: {
+      name: string;
+      location: string;
+      amenities: Record<string, boolean>; // ✅ was string[]
+      coverImage?: File;
+      status?: string;
+    }) => {
+      // console.log("from myvenu",data)
+      const updateData: VenueUpdate = {
+        name: data.name,
+        location: data.location,
+        amenities: data.amenities, // ✅ already correct format, no conversion needed
+        ...(data.coverImage && { coverImage: data.coverImage }),
+        status: data.status as VenueStatus,
+      };
+      return turfApi.updateVenue(venue.id, updateData);
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: venueQueryKeys.all });
       setShowEditModal(false);
@@ -86,8 +87,11 @@ const updateVenueMutation = useMutation({
 
   return (
     <>
-      <div className="bg-white rounded-lg shadow overflow-hidden " >
-        <div className="h-48 bg-gray-200 relative hover:shadow-lg transition cursor-pointer" onClick={() => navigate(`/owner/turfs/${venue.id}`)}>
+      <div className="bg-white rounded-lg shadow overflow-hidden ">
+        <div
+          className="h-48 bg-gray-200 relative hover:shadow-lg transition cursor-pointer"
+          onClick={() => navigate(`/owner/turfs/${venue.id}`)}
+        >
           {venue.coverImage && (
             <img
               src={venue.coverImage}
@@ -114,7 +118,7 @@ const updateVenueMutation = useMutation({
         </div>
 
         <div className="p-4">
-          <h3 
+          <h3
             className="text-lg font-semibold text-gray-900 mb-2 cursor-pointer hover:text-blue-600 transition"
             onClick={() => navigate(`/owner/turfs/${venue.id}`)}
           >
@@ -123,34 +127,43 @@ const updateVenueMutation = useMutation({
           <span className="text-sm font-medium text-gray-500 mb-1">
             Status: {venue.status}
           </span>
-          <p className="text-gray-600 text-sm mb-4">Location: {venue.location}</p>
+          <p className="text-gray-600 text-sm mb-4">
+            Location: {venue.location}
+          </p>
           <p className="text-gray-500 text-xs mb-4">{venue.turfCount} courts</p>
-
-          <div className="flex gap-2">
-            {showEditButton && (
-              <button
-                onClick={() => setShowEditModal(true)}
-                className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 text-sm font-medium"
-              >
-                Edit
+          {venue.status === "suspended" ? (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 mt-2">
+              This venue has been suspended by the admin. Please contact support
+              for more information.
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              {showEditButton && (
+                <button
+                  onClick={() => setShowEditModal(true)}
+                  className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 text-sm font-medium"
+                >
+                  Edit
+                </button>
+              )}
+              {showCheckButton && (
+                <button
+                  onClick={handleCheckVerification}
+                  disabled={isFetching}
+                  className="flex-1 px-3 py-2 bg-green-50 text-green-600 rounded hover:bg-green-100 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {buttonLabel}
+                </button>
+              )}
+              <button 
+              // onClick = {() => setShowDeleteModal(true)}
+              className="flex-1 px-3 py-2 bg-red-50 text-red-600 rounded hover:bg-red-100 text-sm font-medium">
+                Delete
               </button>
-            )}
-            {showCheckButton && (
-              <button
-                onClick={handleCheckVerification}
-                disabled={isFetching}
-                className="flex-1 px-3 py-2 bg-green-50 text-green-600 rounded hover:bg-green-100 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {buttonLabel}
-              </button>
-            )}
-            <button className="flex-1 px-3 py-2 bg-red-50 text-red-600 rounded hover:bg-red-100 text-sm font-medium">
-              Delete
-            </button>
-          </div>
+            </div>
+          )}
         </div>
       </div>
-
       {showEditModal && (
         <VenueEditModal
           venue={venue}
@@ -161,7 +174,21 @@ const updateVenueMutation = useMutation({
           isLoading={updateVenueMutation.isPending}
         />
       )}
-
+      {/* {showDeleteModal && (
+        <DeleteVenueModal
+          // venue={venue}
+          // onCancel={() => setShowDeleteModal(false)}
+          // onDelete={() => {
+          //   turfApi.deleteVenue(venue.id).then(() => {
+          //     void queryClient.invalidateQueries({ queryKey: venueQueryKeys.all });
+          //     setShowDeleteModal(false);
+          //     alert("Venue deleted successfully!");
+          //   }).catch((error) => {
+          //     alert(`Failed to delete venue: ${error.message}`);
+          //   });
+          // }}
+        />
+      )} */}
       {showVerificationModal && verificationStatus && (
         <VerificationModal
           status={verificationStatus}
@@ -193,8 +220,7 @@ export default function MyVenues() {
           className="bg-primary text-on-primary px-xl py-lg rounded-xl flex items-center gap-sm font-semibold hover:opacity-90 transition-opacity active:scale-95"
         >
           <span className="material-symbols-outlined">add</span>
-
-           Add New Venue
+          Add New Venue
         </button>
       </div>
 
