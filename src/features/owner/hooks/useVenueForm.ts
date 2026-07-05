@@ -10,6 +10,7 @@ import {
 import { LuCircleParking } from "react-icons/lu";
 import { FaPeopleRobbery } from "react-icons/fa6";
 import { IoFlashlight } from "react-icons/io5";
+import {VenueStatus} from "@/types/turf.types";
 
 export const AMENITY_OPTIONS = [
   { icon: LuCircleParking, label: "Parking" },
@@ -61,12 +62,12 @@ export function amenityLabelsToObject(
     ]),
   );
 }
-
 export interface VenueFormState {
   name: string;
   location: string;
   coverImage: File | null;
   amenities: string[]; // array of display labels
+  status?: VenueStatus; // optional, only used in edit mode
 }
 
 export interface UseVenueFormOptions {
@@ -83,6 +84,7 @@ export function useVenueForm({
     location: initialValues.location ?? "",
     coverImage: initialValues.coverImage ?? null,
     amenities: initialValues.amenities ?? [],
+    status: initialValues.status ?? "draft",
   });
 
   const setField = <K extends keyof VenueFormState>(

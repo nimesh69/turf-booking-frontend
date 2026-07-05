@@ -14,6 +14,7 @@ interface VenueEditModalProps {
     location: string;
     amenities: Record<string, boolean>;
     coverImage?: File;
+    status?:string;
   }) => void;
   onCancel: () => void;
   isLoading?: boolean;
@@ -32,6 +33,7 @@ export function VenueEditModal({
       name: venue.name,
       location: venue.location,
       amenities: amenityObjectToLabels(venue.amenities),
+      status: venue.status,
     },
   });
   const hasChanges =
@@ -39,7 +41,8 @@ export function VenueEditModal({
     formData.location !== venue.location ||
     JSON.stringify(formData.amenities.sort()) !==
       JSON.stringify(amenityObjectToLabels(venue.amenities).sort()) ||
-    formData.coverImage;
+    formData.coverImage ||
+    formData.status !== venue.status;
 
     // console.log("chsnges detected", hasChanges)
   const handleSubmit = () => {
@@ -49,6 +52,7 @@ export function VenueEditModal({
       location: formData.location,
       amenities: amenityLabelsToObject(formData.amenities),
       coverImage: formData.coverImage ?? undefined,
+      status: formData.status,
     });
   };
 //   console.log({
@@ -85,7 +89,6 @@ export function VenueEditModal({
             disabled={isLoading}
           />
         </div>
-
         {/* Actions */}
         <div className="flex gap-3 justify-end">
           <button

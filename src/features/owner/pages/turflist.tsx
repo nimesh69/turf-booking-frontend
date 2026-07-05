@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { turfApi } from "@/api/turf.api";
@@ -17,7 +17,7 @@ export default function TurfList() {
     openingTime: "06:00",
     closingTime: "22:00",
   });
-
+  const initialFormDataRef = useRef<CourtFormData>({});
   const sportOptions = [
     "Futsal",
     "Basketball",
@@ -61,21 +61,24 @@ export default function TurfList() {
     },
   });
 
-  const handleEdit = (turf: TurfListItem) => {
-    setFormData({
-      sportType: turf.sport,
-      name: turf.name,
-      description: turf.description ?? "",
-      pricePerHour: parseFloat(turf.price_per_hour?.toString() ?? "0"),
-      maxPlayers: turf.max_players,
-      openingTime: turf.opening_time ?? "",
-      closingTime: turf.closing_time ?? "",
-      status: turf.status,
-    });
-    setEditingId(turf.id.toString());
-    setShowModal(true);
+const handleEdit = (turf: TurfListItem) => {
+  const data: CourtFormData = {
+    sportType: turf.sport,
+    name: turf.name,
+    description: turf.description ?? "",
+    pricePerHour: parseFloat(turf.price_per_hour?.toString() ?? "0"),
+    maxPlayers: turf.max_players,
+    openingTime: turf.opening_time ?? "",
+    closingTime: turf.closing_time ?? "",
+    status: turf.status,
   };
-
+  initialFormDataRef.current = data;  // sync, before re-render
+  setFormData(data);
+  setEditingId(turf.id.toString());
+  setShowModal(true);
+};
+  // console.log('initialFormData:', JSON.stringify(initialFormData));
+// console.log('formData:', JSON.stringify(formData));
   const handleClose = () => {
     setShowModal(false);
     setEditingId(null);
@@ -339,8 +342,10 @@ export default function TurfList() {
 
       <CourtModal
         showModal={showModal}
+        key={editingId ?? 'new'}
         editingId={editingId}
         formData={formData}
+        initialFormData={formData}
         sportOptions={sportOptions}
         onFormChange={setFormData}
         onClose={handleClose}

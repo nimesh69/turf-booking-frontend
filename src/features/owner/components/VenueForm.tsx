@@ -7,7 +7,7 @@ interface VenueFormFieldsProps {
   /** Called when any single field changes */
   onFieldChange: <K extends keyof VenueFormState>(
     key: K,
-    value: VenueFormState[K]
+    value: VenueFormState[K],
   ) => void;
   onToggleAmenity: (label: string) => void;
   /** Show the "Full Address" field — only needed during venue creation (Step 1) */
@@ -25,7 +25,7 @@ export function VenueFormFields({
     "w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 " +
     "focus:border-blue-500 focus:outline-none transition-all " +
     "disabled:bg-gray-50 disabled:cursor-not-allowed";
-    // console.log("Rendering VenueFormFields with formData:", formData);
+  console.log("Rendering VenueFormFields with formData:", formData);
   return (
     <div className="space-y-6">
       {/* Venue Name */}
@@ -103,6 +103,50 @@ export function VenueFormFields({
           })}
         </div>
       </div>
+      {formData.status === "draft" ? (
+        <div className="text-sm text-gray-500">
+          Your venue is currently in draft mode. You can edit the details and
+          publish it when ready.
+        </div>
+      ) : (
+        <div>
+          <label className="block text-sm font-semibold text-gray-900 mb-2">
+            Status
+          </label>
+          {formData.status === "suspended" ? (
+            <div className="flex items-center gap-3">
+              <span
+                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-red-100 text-red-700
+              `}
+              >
+                {formData.status}
+              </span>
+              <span className="text-xs text-gray-400">
+                Controlled by admin — cannot be changed
+              </span>
+            </div>
+          ) : (
+            <div className="flex gap-3">
+              {(["active", "inactive"] as const).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => onFieldChange("status", s)}
+                  className={`flex-1 py-2 rounded-lg border text-sm font-semibold transition ${
+                    formData.status === s
+                      ? s === "active"
+                        ? "bg-green-50 border-green-500 text-green-700"
+                        : "bg-gray-100 border-gray-400 text-gray-700"
+                      : "border-gray-300 text-gray-500 hover:bg-gray-50"
+                  }`}
+                >
+                  {s === "active" ? "● Active" : "○ Inactive"}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
