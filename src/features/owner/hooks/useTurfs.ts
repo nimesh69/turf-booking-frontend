@@ -42,3 +42,12 @@ export function useVenueVerification(venueId: string) {
     staleTime: Infinity,
   });
 }
+
+export function useVenueDetail(venueId: string) {
+  return useQuery({
+    queryKey: venueQueryKeys.detail(venueId),
+    queryFn: () => turfApi.getVenue(venueId),
+    enabled: !!venueId,
+    staleTime: Infinity,
+  });
+}
