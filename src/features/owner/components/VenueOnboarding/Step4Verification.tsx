@@ -74,10 +74,8 @@ export default function Step4Verification({ onNext, onBack }: Step4Props) {
             </p>
           </div>
         </div>
-      </div>
-
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full z-40 flex justify-between items-center px-6 py-4 bg-white border-t border-gray-200 shadow-lg">
+      <nav className="flex justify-between items-center mt-8 gap-4">
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors px-4 py-2 rounded-lg hover:bg-gray-50 font-semibold"
@@ -94,6 +92,8 @@ export default function Step4Verification({ onNext, onBack }: Step4Props) {
           <ChevronRight size={20} />
         </button>
       </nav>
+      </div>
+
     </main>
   );
 }

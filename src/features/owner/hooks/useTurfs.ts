@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { turfApi } from '@/api/turf.api';
 import type { TurfFilters } from '@/types/turf.types';
-
 export const turfQueryKeys = {
   all: ['turfs'] as const,
   lists: () => [...turfQueryKeys.all, 'list'] as const,

@@ -10,6 +10,16 @@ export type Sport =
   | "pickleball"
   | "table_tennis";
 
+export const sportMap: Record<string, Sport> = {
+  Futsal: "futsal",
+  Basketball: "basketball",
+  Tennis: "tennis",
+  Badminton: "badminton",
+  Cricket: "cricket",
+  Volleyball: "volleyball",
+  Pickleball: "pickleball",
+  "Table Tennis": "table_tennis",
+};
 export type VenueStatus = "draft" | "active" | "inactive" | "suspended";
 export type TurfStatus  = "draft" | "active" | "inactive" | "suspended";
 

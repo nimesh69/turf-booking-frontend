@@ -52,10 +52,10 @@ export default function Step5PreviewReview({ data, isSubmitting = false, errorMe
               <label className="text-xs font-semibold text-gray-600 block mb-2">Venue Name</label>
               <p className="text-lg font-semibold text-gray-900">{venueDetails?.venueName}</p>
             </div>
-            <div>
+            {/* <div>
               <label className="text-xs font-semibold text-gray-600 block mb-2">Full Address</label>
               <p className="text-lg font-semibold text-gray-900">{venueDetails?.address}</p>
-            </div>
+            </div> */}
           </div>
         </div>
       </section>
@@ -172,7 +172,7 @@ export default function Step5PreviewReview({ data, isSubmitting = false, errorMe
       )}
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 w-full z-40 flex justify-between items-center px-6 py-4 bg-white border-t border-gray-200 shadow-lg">
+      <nav className="flex justify-between items-center mt-8 gap-4">
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-gray-700 hover:text-blue-600 transition-colors px-4 py-2 rounded-lg hover:bg-gray-50 font-semibold"

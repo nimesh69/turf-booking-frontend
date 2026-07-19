@@ -25,7 +25,7 @@ export function VenueFormFields({
     "w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-gray-900 " +
     "focus:border-blue-500 focus:outline-none transition-all " +
     "disabled:bg-gray-50 disabled:cursor-not-allowed";
-  console.log("Rendering VenueFormFields with formData:", formData);
+  // console.log("Rendering VenueFormFields with formData:", formData);
   return (
     <div className="space-y-6">
       {/* Venue Name */}
