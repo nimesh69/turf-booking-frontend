@@ -1,5 +1,5 @@
 import { getMediaUrl } from "@/lib/media";
-import  axiosInstance from "./axios";
+import axiosInstance from "./axios";
 // import axios from "./axios";
 import type {
   Sport,
@@ -269,10 +269,10 @@ export const turfApi = {
     return toVenue(response.data);
   },
   checkVenueVerificationStatus: async (venueId: string) => {
-      const { data } = await axiosInstance.get<RawVenueVerification>(
-        `${venuesUrl}${venueId}/verification/`,
-      );
-      return toVenueVerification(data, venueId);
+    const { data } = await axiosInstance.get<RawVenueVerification>(
+      `${venuesUrl}${venueId}/verification/`,
+    );
+    return toVenueVerification(data, venueId);
   },
   createFullVenue: async (data: {
     venue: VenueCreate;
@@ -314,7 +314,8 @@ export const turfApi = {
     );
     return toVenue(response.data);
   },
-  deleteVenue: (id: string) => axiosInstance.delete(`${venuesUrl}${id}/`),
+  deleteVenue: (id: string, password: string) =>
+    axiosInstance.post(`${venuesUrl}${id}/confirm-delete/`, { password }),
   getVenueVerification: async (venueId: string) => {
     const { data } = await axiosInstance.get<RawVenueVerification>(
       `${venuesUrl}${venueId}/verification/`,
@@ -366,7 +367,8 @@ export const turfApi = {
     );
     return toTurf(response.data);
   },
-  deleteTurf: (id: string) => axiosInstance.delete(`${turfsUrl}${id}/`),
+  deleteTurf: (id: string, password: string) =>
+    axiosInstance.post(`${turfsUrl}${id}/confirm-delete/`, { password }),
   getTurfAvailability: async (
     turfId: string,
     date: string,
