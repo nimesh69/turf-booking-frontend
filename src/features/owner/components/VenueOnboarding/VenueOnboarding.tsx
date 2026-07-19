@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { turfApi } from "@/api/turf.api";
 import type {
-  Sport,
   TurfCreate,
   VenueAmenities,
   VenueVerificationSubmit,
@@ -17,7 +16,7 @@ import Step4Verification from "./Step4Verification";
 import type { VerificationData } from "./Step4Verification";
 import Step5PreviewReview from "./Step5PreviewReview";
 import { turfQueryKeys, venueQueryKeys } from "../../hooks/useTurfs";
-
+import { sportMap } from '@/types/turf.types';
 interface VenueOnboardingProps {
   onClose: () => void;
 }
@@ -41,17 +40,6 @@ const amenityMap: Record<string, keyof VenueAmenities> = {
   FloodLight: "flood_light",
   CCTV: "cctv",
   "Drinking Water": "drinking_water",
-};
-
-const sportMap: Record<string, Sport> = {
-  Futsal: "futsal",
-  Basketball: "basketball",
-  Tennis: "tennis",
-  Badminton: "badminton",
-  Cricket: "cricket",
-  Volleyball: "volleyball",
-  Pickleball: "pickleball",
-  "Table Tennis": "table_tennis",
 };
 
 const toTime = (time: string) => (time.length === 5 ? `${time}:00` : time);

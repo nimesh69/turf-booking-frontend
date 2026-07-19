@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { ChevronRight, Edit, Trash2, Plus } from "lucide-react";
 import CourtModal from "../CourtModal";
-
 interface Step2Props {
   onNext: (data: CourtsData) => void;
   onBack: () => void;
+  venueId?: string; //Optional prop to pass venueId if needed
 }
 
 export interface Court {
@@ -22,7 +22,7 @@ export interface CourtsData {
   courts: Court[];
 }
 
-export default function Step2AddCourts({ onNext, onBack }: Step2Props) {
+export default function Step2AddCourts({ onNext, onBack, venueId }: Step2Props) {
   const [courts, setCourts] = useState<Court[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState<Partial<Court>>({
@@ -31,7 +31,7 @@ export default function Step2AddCourts({ onNext, onBack }: Step2Props) {
     closingTime: "22:00",
   });
   const [editingId, setEditingId] = useState<string | null>(null);
-
+  // console.log("venueid is ",venueId);
   const sportOptions = [
     "Futsal",
     "Basketball",
@@ -108,6 +108,10 @@ export default function Step2AddCourts({ onNext, onBack }: Step2Props) {
     <main className="pt-[88px] pb-8 max-w-5xl mx-auto px-6">
       {/* Progress Indicator */}
       <div className="mb-8">
+        {venueId ? (
+          <div className="flex justify-normal text-primary">VenueId: {venueId}</div>
+        ):(
+          <>
         <div className="flex items-center justify-between mb-3">
           <span className="font-semibold text-blue-600 uppercase tracking-wider text-sm">
             Step 2 of 5
@@ -123,7 +127,9 @@ export default function Step2AddCourts({ onNext, onBack }: Step2Props) {
           <div className="h-full w-1/5 bg-gray-300 rounded-full"></div>
           <div className="h-full w-1/5 bg-gray-300 rounded-full"></div>
         </div>
-        <h1 className="text-3xl font-bold mt-4">Add Your Courts</h1>
+          </>
+        )}
+        <h1 className="text-3xl font-bold mt-4 text-primary">Add Your Courts</h1>
         <p className="text-gray-600 text-sm">
           List the individual spaces or courts available at your venue.
         </p>
@@ -206,7 +212,9 @@ export default function Step2AddCourts({ onNext, onBack }: Step2Props) {
         <CourtModal
           showModal={showModal}
           editingId={null}
+          // venueId={venueId}
           formData={formData}
+          initialFormData={formData}
           sportOptions={sportOptions}
           onFormChange={setFormData}
           onClose={() => setShowModal(false)}

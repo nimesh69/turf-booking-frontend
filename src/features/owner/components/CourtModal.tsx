@@ -1,7 +1,7 @@
 // import React from "react";
 import { useState } from 'react';
 export type TurfStatus = "active" | "inactive" | "draft" | "suspended";
-
+// import type { Sport } from "@/types/turf.types"
 export interface CourtFormData {
   sportType?: string;
   name?: string;
@@ -19,6 +19,7 @@ interface CourtModalProps {
   formData: CourtFormData;
   initialFormData: CourtFormData;  // Optional prop for initial form data when editing
   sportOptions: string[];
+  // venueId?: string; //Optional prop to add new court
   onFormChange: (data: CourtFormData) => void;
   onClose: () => void;
   onSubmit: () => void;
@@ -28,6 +29,7 @@ export default function CourtModal({
   showModal,
   editingId,
   formData,
+  // venueId,
   initialFormData,
   sportOptions,
   onFormChange,

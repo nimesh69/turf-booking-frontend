@@ -7,7 +7,8 @@ import CourtModal, { type CourtFormData } from "../components/CourtModal";
 import ConfirmDeleteModal from "../modals/ConfirmDeleteModal";
 import { venueQueryKeys, useVenueDetail } from "../hooks/useTurfs";
 import { useConfirmDelete } from "../hooks/useConfirmDelete";
-
+// import { Step2AddCourts } from "../components/VenueOnboarding";
+import AddCourtsWizard from "../components/AddCourtsWizard";
 export default function TurfList() {
   const { venueId } = useParams<{ venueId: string }>();
   if (!venueId) {
@@ -23,6 +24,7 @@ export default function TurfList() {
     openingTime: "06:00",
     closingTime: "22:00",
   });
+  const [showAddCourts, setShowAddCourts] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTurf, setSelectedTurf] = useState<TurfListItem | null>(null);
   const initialFormDataRef = useRef<CourtFormData>({});
@@ -172,9 +174,12 @@ export default function TurfList() {
           </nav>
           <h1 className="font-h1 text-h1 text-primary">Venue Courts</h1>
         </div>
-        <button className="bg-primary text-on-primary px-xl py-lg rounded-xl flex items-center gap-sm font-semibold hover:opacity-90 transition-opacity active:scale-95">
+        <button
+          className="bg-primary text-on-primary px-xl py-lg rounded-xl flex items-center gap-sm font-semibold hover:opacity-90 transition-opacity active:scale-95"
+          onClick={() => setShowAddCourts(true)}
+        >
           <span className="material-symbols-outlined">add</span>
-          Add New Truf
+          Add New Turf
         </button>
       </div>
 
@@ -386,6 +391,12 @@ export default function TurfList() {
               setShowDeleteModal(false);
             }
           }}
+        />
+      )}
+      {showAddCourts && (
+        <AddCourtsWizard
+          venueId={venueId}
+          onClose={() => setShowAddCourts(false)}
         />
       )}
     </main>
