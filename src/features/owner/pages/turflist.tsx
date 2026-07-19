@@ -6,9 +6,13 @@ import type { TurfListItem } from "@/types/turf.types";
 import CourtModal, { type CourtFormData } from "../components/CourtModal";
 import ConfirmDeleteModal from "../modals/ConfirmDeleteModal";
 import { venueQueryKeys, useVenueDetail } from "../hooks/useTurfs";
+import { useConfirmDelete } from "../hooks/useConfirmDelete";
 
 export default function TurfList() {
   const { venueId } = useParams<{ venueId: string }>();
+  if (!venueId) {
+    throw new Error("Venue ID is required");
+  }
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -73,6 +77,14 @@ export default function TurfList() {
     setSelectedTurf(turf);
     setShowDeleteModal(true);
   };
+  const turfDelete = useConfirmDelete(
+    // if (!venueId) return Promise.reject(new Error("Venue ID is required"));
+    turfApi.deleteTurf,
+    () =>
+      queryClient.invalidateQueries({
+        queryKey: venueQueryKeys.detail(venueId),
+      }),
+  );
   // console.log('initialFormData:', JSON.stringify(initialFormData));
   // console.log('formData:', JSON.stringify(formData));
   const handleClose = () => {
@@ -354,23 +366,25 @@ export default function TurfList() {
         <ConfirmDeleteModal
           title="Delete Turf"
           message="Are you sure you want to delete"
-          itemName={setSelectedTurf?.name}
-          onCancel={() => setShowDeleteModal(false)}
-          onConfirm={() => {
-            if (!selectedTurf) return; // guards both TS and runtime
+          itemName={selectedTurf?.name}
+          password={turfDelete.password}
+          onPasswordChange={turfDelete.setPassword}
+          isDeleting={turfDelete.isDeleting}
+          error={turfDelete.error}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            turfDelete.reset();
+          }}
+          onConfirm={async () => {
+            if (!selectedTurf) return;
 
-            turfApi
-              .deleteTurf(selectedTurf.id.toString()) // now narrowed to `string`
-              .then(() => {
-                void queryClient.invalidateQueries({
-                  queryKey: venueQueryKeys.detail(venueId),
-                });
-                setShowDeleteModal(false);
-                alert("Turf deleted successfully!");
-              })
-              .catch((error) => {
-                alert(`Failed to delete Turf: ${error.message}`);
-              });
+            const success = await turfDelete.confirmDelete(
+              selectedTurf.id.toString(),
+            );
+
+            if (success) {
+              setShowDeleteModal(false);
+            }
           }}
         />
       )}

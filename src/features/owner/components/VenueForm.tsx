@@ -105,8 +105,7 @@ export function VenueFormFields({
       </div>
       {formData.status === "draft" ? (
         <div className="text-sm text-gray-500">
-          Your venue is currently in draft mode. You can edit the details and
-          publish it when ready.
+          Your venue will be in draft mode. Once admin verifies your venue, it will be published and visible to users.
         </div>
       ) : (
         <div>

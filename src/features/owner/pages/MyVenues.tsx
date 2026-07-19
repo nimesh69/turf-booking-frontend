@@ -9,7 +9,8 @@ import { VerificationModal } from "../modals/verificationModal";
 import { VenueEditModal } from "../modals/venueEditModal";
 import { venueQueryKeys } from "../hooks/useTurfs";
 import { VenueStatus } from "@/types/turf.types";
-import  ConfirmDeleteModal  from "../modals/ConfirmDeleteModal";
+import ConfirmDeleteModal from "../modals/ConfirmDeleteModal";
+import { useConfirmDelete } from "../hooks/useConfirmDelete";
 function VenueCard({ venue }: { venue: VenueListItem }) {
   const navigate = useNavigate();
   const [canRecheck, setCanRecheck] = useState(true);
@@ -71,7 +72,13 @@ function VenueCard({ venue }: { venue: VenueListItem }) {
     refetch().then(() => setShowVerificationModal(true));
     setTimeout(() => setCanRecheck(true), 2 * 60 * 1000);
   }, [canRecheck, isFetching, verificationStatus, refetch]);
+  const venueDelete = useConfirmDelete(turfApi.deleteVenue, () => {
+    void queryClient.invalidateQueries({
+      queryKey: venueQueryKeys.all,
+    });
 
+    setShowDeleteModal(false);
+  });
   // button label logic
   const buttonLabel = isFetching
     ? "Checking..."
@@ -180,20 +187,16 @@ function VenueCard({ venue }: { venue: VenueListItem }) {
           title="Delete Venue"
           message="Are you sure you want to delete"
           itemName={venue.name}
-          onCancel={() => setShowDeleteModal(false)}
+          password={venueDelete.password}
+          onPasswordChange={venueDelete.setPassword}
+          isDeleting={venueDelete.isDeleting}
+          error={venueDelete.error}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            venueDelete.reset();
+          }}
           onConfirm={() => {
-            turfApi
-              .deleteVenue(venue.id)
-              .then(() => {
-                void queryClient.invalidateQueries({
-                  queryKey: venueQueryKeys.all,
-                });
-                setShowDeleteModal(false);
-                alert("Venue deleted successfully!");
-              })
-              .catch((error) => {
-                alert(`Failed to delete venue: ${error.message}`);
-              });
+            void venueDelete.confirmDelete(venue.id);
           }}
         />
       )}
