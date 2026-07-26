@@ -258,7 +258,10 @@ export default function TurfList() {
               key={turf.id}
               className="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group"
             >
-              <div className="relative h-48 w-full overflow-hidden">
+              <div
+                className="relative h-48 w-full overflow-hidden cursor-pointer"
+                onClick={() => navigate(`/owner/turfs/${turf.name}/${turf.id}`)}
+              >
                 {turf.coverImage ? (
                   <img
                     src={turf.coverImage}

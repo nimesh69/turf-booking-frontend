@@ -30,6 +30,7 @@ import OwnerFinance from '@/features/owner/pages/Finance';
 import OwnerMyVenues from '@/features/owner/pages/MyVenues';
 import OwnerSettings from '@/features/owner/pages/Settings';
 import TurfList from '@/features/owner/pages/turflist';
+import ManageTruf from '@/features/owner/pages/manageTruf';
 export default function AppRoutes() {
   return (
     <Routes>
@@ -74,6 +75,7 @@ export default function AppRoutes() {
           <Route path="/owner/finance" element={<OwnerFinance />} />
           <Route path="/owner/venues" element={<OwnerMyVenues />} />
           <Route path="/owner/turfs/:venueId" element={<TurfList />} />
+          <Route path="/owner/turfs/:turfName/:turfId" element={<ManageTruf />} />
           <Route path="/owner/settings" element={<OwnerSettings />} />
         </Route>
       </Route>

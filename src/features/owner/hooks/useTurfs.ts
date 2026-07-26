@@ -50,3 +50,11 @@ export function useVenueDetail(venueId: string) {
     staleTime: Infinity,
   });
 }
+export function useTurfDetail(turfId: string) {
+  return useQuery({
+    queryKey: turfQueryKeys.detail(turfId),
+    queryFn: () => turfApi.getTurf(turfId),
+    enabled: !!turfId,
+    staleTime: Infinity,
+  })
+}
