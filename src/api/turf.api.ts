@@ -404,14 +404,27 @@ export const turfApi = {
     imageId: number,
     data: TurfImageUpdate,
   ) => {
+    const formData = new FormData();
+
+    if (data.image) {
+      formData.append("image", data.image);
+    }
+
+    if (data.order !== undefined) {
+      formData.append("order", String(data.order));
+    }
+
     const response = await axiosInstance.patch<RawTurfImage>(
       `${turfsUrl}${turfId}/images/${imageId}/`,
-      data,
+      formData,
     );
+
     return toTurfImage(response.data, turfId);
   },
-  deleteTurfImage: (turfId: string, imageId: number) =>
-    axiosInstance.delete(`${turfsUrl}${turfId}/images/${imageId}/`),
+  deleteTurfImage: (turfId: string, imageId: number, password: string) =>
+    axiosInstance.delete(`${turfsUrl}${turfId}/images/${imageId}/`, {
+      data: { password },
+    }),
   listTurfReviews: async (turfId: string) => {
     const { data } = await axiosInstance.get<RawTurfReview[]>(
       `${turfsUrl}${turfId}/reviews/`,

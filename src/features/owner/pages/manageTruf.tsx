@@ -1,6 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { venueQueryKeys, useTurfDetail } from "../hooks/useTurfs";
+import { useTurfDetail, turfQueryKeys } from "../hooks/useTurfs";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import ConfirmDeleteModal from "../modals/ConfirmDeleteModal";
+import { useConfirmDelete } from "../hooks/useConfirmDelete";
+import { turfApi } from "@/api/turf.api";
 const MAX = 5;
 export default function ManageTruf() {
   const { turfName, turfId } = useParams<{
@@ -10,11 +14,12 @@ export default function ManageTruf() {
   const { data: turf, isLoading, error } = useTurfDetail(turfId || "");
 
   //   const navigate = useNavigate();
-  console.log("venueid is ", turfName, turfId, turf);
+  // console.log("venueid is ", turfName, turfId, turf);
   if (!turfId) {
     throw new Error("Venue ID is required");
   }
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [replaceModalOpen, setReplaceModalOpen] = useState(false);
   // 2. Allow the state to hold a string (the object URL) or null
   // 1. Allow the state to hold a File object or null
@@ -23,6 +28,8 @@ export default function ManageTruf() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const openReplace = (id: number) => {
     setSelectedImageId(id);
     setPreviewUrl(null);
@@ -37,11 +44,53 @@ export default function ManageTruf() {
     setPreviewUrl(URL.createObjectURL(file)); // preview before upload
   };
 
-  const confirmReplace = () => {
-    // TODO: upload `selectedFile` to API, then refresh images
-    // on success: close modal, clear state
+  const confirmReplace = async () => {
+    console.log("id is ", selectedImageId, selectedFile);
+
+    if (!selectedImageId || !selectedFile) return;
+
+    try {
+      await turfApi.updateTurfImage(turfId, selectedImageId, {
+        image: selectedFile,
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: turfQueryKeys.detail(turfId),
+      });
+
+      // close modal
+      setReplaceModalOpen(false);
+      setSelectedImageId(null);
+      setSelectedFile(null);
+    } catch (error) {
+      console.error("Failed to replace image:", error);
+    }
   };
-  const handleDelete = (imageId: number) => {};
+  const updateImageOrder = async (imageId: number, order: number) => {
+    try {
+      await turfApi.updateTurfImage(turfId, imageId, {
+        order,
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: turfQueryKeys.detail(turfId),
+      });
+    } catch (error) {
+      console.error("Failed to update image order:", error);
+    }
+  };
+  const handleDelete = async (imageId: number) => {
+    setSelectedImageId(imageId);
+    setShowDeleteModal(true);
+  };
+  const turfImageDelete = useConfirmDelete(
+    (imageId: number, password: string) =>
+      turfApi.deleteTurfImage(turfId, imageId, password),
+    () =>
+      queryClient.invalidateQueries({
+        queryKey: turfQueryKeys.detail(turfId),
+      }),
+  );
   if (!turfId) {
     return (
       <main className="flex-1 p-xl lg:px-xxl overflow-y-auto">
@@ -260,6 +309,31 @@ export default function ManageTruf() {
             </div>
           </div>
         </div>
+      )}
+      {showDeleteModal && (
+        <ConfirmDeleteModal
+          title="Delete Image"
+          message="Are you sure you want to delete"
+          itemName="this image"
+          password={turfImageDelete.password}
+          onPasswordChange={turfImageDelete.setPassword}
+          isDeleting={turfImageDelete.isDeleting}
+          error={turfImageDelete.error}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            turfImageDelete.reset();
+          }}
+          onConfirm={async () => {
+            if (!selectedImageId) return;
+
+            const success =
+              await turfImageDelete.confirmDelete(selectedImageId);
+
+            if (success) {
+              setShowDeleteModal(false);
+            }
+          }}
+        />
       )}
     </main>
   );

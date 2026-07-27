@@ -5,8 +5,8 @@ interface DeleteErrorResponse {
   password?: string;
   detail?: string;
 }
-export function useConfirmDelete<T>(
-  deleteFn: (id: string, password: string) => Promise<T>,
+export function useConfirmDelete<T, ID = string>(
+  deleteFn: (id: ID, password: string) => Promise<T>,
   onSuccess: () => void,
 ) {
   const [password, setPassword] = useState("");
@@ -18,7 +18,7 @@ export function useConfirmDelete<T>(
     setError(undefined);
   };
 
-  const confirmDelete = async (id: string) => {
+  const confirmDelete = async (id: ID) => {
     setIsDeleting(true);
     setError(undefined);
 
