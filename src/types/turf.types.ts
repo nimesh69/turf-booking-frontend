@@ -126,6 +126,7 @@ export interface TurfImage {
 
 export interface TurfImageUpdate {
   order?: number;
+  image?: File;
 }
 
 

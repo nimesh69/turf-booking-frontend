@@ -404,10 +404,21 @@ export const turfApi = {
     imageId: number,
     data: TurfImageUpdate,
   ) => {
+    const formData = new FormData();
+
+    if (data.image) {
+      formData.append("image", data.image);
+    }
+
+    if (data.order !== undefined) {
+      formData.append("order", String(data.order));
+    }
+
     const response = await axiosInstance.patch<RawTurfImage>(
       `${turfsUrl}${turfId}/images/${imageId}/`,
-      data,
+      formData,
     );
+
     return toTurfImage(response.data, turfId);
   },
   deleteTurfImage: (turfId: string, imageId: number) =>

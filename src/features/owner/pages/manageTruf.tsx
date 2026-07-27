@@ -1,6 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { venueQueryKeys, useTurfDetail } from "../hooks/useTurfs";
+import {
+  useTurfDetail,
+  turfQueryKeys,
+} from "../hooks/useTurfs";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import ConfirmDeleteModal from "../modals/ConfirmDeleteModal";
+import { turfApi } from "@/api/turf.api";
 const MAX = 5;
 export default function ManageTruf() {
   const { turfName, turfId } = useParams<{
@@ -15,6 +21,7 @@ export default function ManageTruf() {
     throw new Error("Venue ID is required");
   }
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [replaceModalOpen, setReplaceModalOpen] = useState(false);
   // 2. Allow the state to hold a string (the object URL) or null
   // 1. Allow the state to hold a File object or null
@@ -23,6 +30,8 @@ export default function ManageTruf() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const openReplace = (id: number) => {
     setSelectedImageId(id);
     setPreviewUrl(null);
@@ -37,11 +46,33 @@ export default function ManageTruf() {
     setPreviewUrl(URL.createObjectURL(file)); // preview before upload
   };
 
-  const confirmReplace = () => {
-    // TODO: upload `selectedFile` to API, then refresh images
-    // on success: close modal, clear state
+  const confirmReplace = async () => {
+    console.log("id is ", selectedImageId, selectedFile);
+
+    if (!selectedImageId || !selectedFile) return;
+
+    try {
+      await turfApi.updateTurfImage(turfId, selectedImageId, {
+        image: selectedFile,
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: turfQueryKeys.detail(turfId),
+      });
+
+      // close modal
+      setReplaceModalOpen(false);
+      setSelectedImageId(null);
+      setSelectedFile(null);
+    } catch (error) {
+      console.error("Failed to replace image:", error);
+    }
   };
-  const handleDelete = (imageId: number) => {};
+  const handleDelete = (imageId: number) => {
+    setSelectedImageId(imageId);
+    setShowDeleteModal(true);
+  };
+
   if (!turfId) {
     return (
       <main className="flex-1 p-xl lg:px-xxl overflow-y-auto">
@@ -261,6 +292,7 @@ export default function ManageTruf() {
           </div>
         </div>
       )}
+
     </main>
   );
 }
