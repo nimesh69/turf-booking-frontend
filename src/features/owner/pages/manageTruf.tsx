@@ -1,11 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  useTurfDetail,
-  turfQueryKeys,
-} from "../hooks/useTurfs";
+import { useTurfDetail, turfQueryKeys } from "../hooks/useTurfs";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import ConfirmDeleteModal from "../modals/ConfirmDeleteModal";
+import { useConfirmDelete } from "../hooks/useConfirmDelete";
 import { turfApi } from "@/api/turf.api";
 const MAX = 5;
 export default function ManageTruf() {
@@ -16,7 +14,7 @@ export default function ManageTruf() {
   const { data: turf, isLoading, error } = useTurfDetail(turfId || "");
 
   //   const navigate = useNavigate();
-  console.log("venueid is ", turfName, turfId, turf);
+  // console.log("venueid is ", turfName, turfId, turf);
   if (!turfId) {
     throw new Error("Venue ID is required");
   }
@@ -68,11 +66,31 @@ export default function ManageTruf() {
       console.error("Failed to replace image:", error);
     }
   };
-  const handleDelete = (imageId: number) => {
+  const updateImageOrder = async (imageId: number, order: number) => {
+    try {
+      await turfApi.updateTurfImage(turfId, imageId, {
+        order,
+      });
+
+      await queryClient.invalidateQueries({
+        queryKey: turfQueryKeys.detail(turfId),
+      });
+    } catch (error) {
+      console.error("Failed to update image order:", error);
+    }
+  };
+  const handleDelete = async (imageId: number) => {
     setSelectedImageId(imageId);
     setShowDeleteModal(true);
   };
-
+  const turfImageDelete = useConfirmDelete(
+    (imageId: number, password: string) =>
+      turfApi.deleteTurfImage(turfId, imageId, password),
+    () =>
+      queryClient.invalidateQueries({
+        queryKey: turfQueryKeys.detail(turfId),
+      }),
+  );
   if (!turfId) {
     return (
       <main className="flex-1 p-xl lg:px-xxl overflow-y-auto">
@@ -292,7 +310,31 @@ export default function ManageTruf() {
           </div>
         </div>
       )}
+      {showDeleteModal && (
+        <ConfirmDeleteModal
+          title="Delete Image"
+          message="Are you sure you want to delete"
+          itemName="this image"
+          password={turfImageDelete.password}
+          onPasswordChange={turfImageDelete.setPassword}
+          isDeleting={turfImageDelete.isDeleting}
+          error={turfImageDelete.error}
+          onCancel={() => {
+            setShowDeleteModal(false);
+            turfImageDelete.reset();
+          }}
+          onConfirm={async () => {
+            if (!selectedImageId) return;
 
+            const success =
+              await turfImageDelete.confirmDelete(selectedImageId);
+
+            if (success) {
+              setShowDeleteModal(false);
+            }
+          }}
+        />
+      )}
     </main>
   );
 }

@@ -421,8 +421,10 @@ export const turfApi = {
 
     return toTurfImage(response.data, turfId);
   },
-  deleteTurfImage: (turfId: string, imageId: number) =>
-    axiosInstance.delete(`${turfsUrl}${turfId}/images/${imageId}/`),
+  deleteTurfImage: (turfId: string, imageId: number, password: string) =>
+    axiosInstance.delete(`${turfsUrl}${turfId}/images/${imageId}/`, {
+      data: { password },
+    }),
   listTurfReviews: async (turfId: string) => {
     const { data } = await axiosInstance.get<RawTurfReview[]>(
       `${turfsUrl}${turfId}/reviews/`,
