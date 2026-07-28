@@ -5,6 +5,7 @@ import { useState } from "react";
 import ConfirmDeleteModal from "../modals/ConfirmDeleteModal";
 import { useConfirmDelete } from "../hooks/useConfirmDelete";
 import { turfApi } from "@/api/turf.api";
+import UploadReplaceModal from "../modals/UploadReplaceModal";
 const MAX = 5;
 export default function ManageTruf() {
   const { turfName, turfId } = useParams<{
@@ -12,8 +13,6 @@ export default function ManageTruf() {
     turfId: string;
   }>();
   const { data: turf, isLoading, error } = useTurfDetail(turfId || "");
-
-  //   const navigate = useNavigate();
   // console.log("venueid is ", turfName, turfId, turf);
   if (!turfId) {
     throw new Error("Venue ID is required");
@@ -275,99 +274,25 @@ export default function ManageTruf() {
       </button>
       // Replace Modal
       {replaceModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-gray-900">Replace Image</h3>
-              <button onClick={() => EmptyState()}>Close</button>
-            </div>
-
-            {/* Current image */}
-            {currentImageUrl && (
-              <img
-                src={currentImageUrl}
-                className="w-full h-48 object-cover rounded-xl"
-              />
-            )}
-
-            {/* File input */}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="block w-full text-sm file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
-            />
-
-            {/* Preview new image */}
-            {previewUrl && (
-              <div className="rounded-xl overflow-hidden border border-gray-200">
-                <img src={previewUrl} className="w-full h-48 object-cover" />
-                <div className="p-3 bg-gray-50 border-t border-gray-200">
-                  <p className="text-xs text-gray-500">New image preview</p>
-                </div>
-              </div>
-            )}
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => EmptyState()}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmReplace}
-                disabled={!selectedFile}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-              >
-                Replace Image
-              </button>
-            </div>
-          </div>
-        </div>
+        <UploadReplaceModal
+          EmptyState={EmptyState}
+          previewUrl={previewUrl}
+          message="Replace Image"
+          confirmUpload={confirmReplace}
+          handleFileChange={handleFileChange}
+          selectedFile={selectedFile}
+          currentImageUrl={currentImageUrl}
+        />
       )}
       {uploadModalOpen && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-gray-900">Upload Image</h3>
-              <button onClick={() => EmptyState()}>...</button>
-            </div>
-            {/* File input */}
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="block w-full text-sm file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"
-            />
-
-            {/* Preview new image */}
-            {previewUrl && (
-              <div className="rounded-xl overflow-hidden border border-gray-200">
-                <img src={previewUrl} className="w-full h-48 object-cover" />
-                <div className="p-3 bg-gray-50 border-t border-gray-200">
-                  <p className="text-xs text-gray-500">New image preview</p>
-                </div>
-              </div>
-            )}
-
-            <div className="flex gap-3">
-              <button
-                onClick={() => EmptyState()}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={confirmUpload}
-                disabled={!selectedFile}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed"
-              >
-                Replace Image
-              </button>
-            </div>
-          </div>
-        </div>
+        <UploadReplaceModal
+          EmptyState={EmptyState}
+          previewUrl={previewUrl}
+          message="Upload Image"
+          confirmUpload={confirmUpload}
+          handleFileChange={handleFileChange}
+          selectedFile={selectedFile}
+        />
       )}
       {showDeleteModal && (
         <ConfirmDeleteModal
