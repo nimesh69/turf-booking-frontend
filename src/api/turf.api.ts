@@ -36,6 +36,7 @@ type RawVenue = {
   created_at: string;
   updated_at?: string;
   deleted_at?: string | null;
+  venue_sports?: Sport[];
 };
 
 type RawTurfImage = {
@@ -131,6 +132,7 @@ const toVenueListItem = (raw: RawVenue): VenueListItem => ({
   turfCount: raw.turfs_count ?? raw.turfs?.length ?? 0,
   createdAt: raw.created_at,
   updatedAt: raw.updated_at ?? raw.created_at,
+  venue_sports: raw.venue_sports ?? [],
 });
 
 const toTurfImage = (raw: RawTurfImage, turfId = ""): TurfImage => ({
@@ -255,6 +257,7 @@ export const turfApi = {
     const { data } = await axiosInstance.get<RawVenue[]>(
       `${venuesUrl}my_venues/`,
     );
+    console.log("res",data);
     return data.map(toVenueListItem);
   },
   getVenue: async (id: string) => {
