@@ -180,7 +180,7 @@ export default function ManageTruf() {
         </div>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-        {turf?.images.map((image, index) => (
+        {turf?.images.map((image) => (
           <div
             key={image.id}
             className="group relative aspect-square rounded-xl overflow-hidden border border-gray-200 bg-gray-100 shadow-sm hover:shadow-md transition-all"
@@ -240,7 +240,7 @@ export default function ManageTruf() {
 
             {/* Index badge */}
             <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/50 backdrop-blur text-white text-xs font-medium rounded-md">
-              {index + 1}
+              {image.order}
             </div>
           </div>
         ))}
