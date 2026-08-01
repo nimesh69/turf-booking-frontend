@@ -18,7 +18,7 @@ function VenueCard({ venue }: { venue: VenueListItem }) {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const queryClient = useQueryClient();
-
+  console.log("venu", venue);
   const {
     data: verificationStatus,
     refetch,
@@ -138,6 +138,16 @@ function VenueCard({ venue }: { venue: VenueListItem }) {
             Location: {venue.location}
           </p>
           <p className="text-gray-500 text-xs mb-4">{venue.turfCount} courts</p>
+          <div className="flex gap-sm mb-xl flex-wrap-reverse">
+            {venue.venue_sports.map((sport) => (
+              <span
+                key={sport}
+                className="bg-surface-container-low px-md py-xs rounded-full font-caption text-caption text-on-surface-variant"
+              >
+                {sport}
+              </span>
+            ))}
+          </div>
           {venue.status === "suspended" ? (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-800 mt-2">
               This venue has been suspended by the admin. Please contact support

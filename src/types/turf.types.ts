@@ -73,6 +73,7 @@ export interface VenueListItem extends BaseModel {
   amenities: VenueAmenities;
   coverImage: string | null;
   turfCount: number;
+  venue_sports: Sport[];
 }
 
 export interface VenueCreate {
