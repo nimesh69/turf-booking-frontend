@@ -1,14 +1,19 @@
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-
-const sidebarItems = [
-  { to: "/owner", label: "Dashboard", icon: "📊" },
-  { to: "/owner/analytics", label: "Analytics", icon: "📈" },
-  { to: "/owner/venues", label: "My Venues", icon: "🏟️" },
-  { to: "/owner/bookings", label: "Bookings", icon: "📅" },
-  { to: "/owner/finance", label: "Finance", icon: "💰" },
-  { to: "/owner/chat", label: "Messages", icon: "💬" },
-  { to: "/owner/settings", label: "Settings", icon: "⚙️" },
+import { Icon } from "@/icons/Icon"
+import { IconName } from "@/icons/icons"
+const sidebarItems: {
+  to: string;
+  label: string;
+  icon: IconName;
+}[] = [
+  { to: "/owner", label: "Dashboard", icon: "dashboard" },
+  { to: "/owner/analytics", label: "Analytics", icon: "analytics" },
+  { to: "/owner/venues", label: "My Venues", icon: "stadium" },
+  { to: "/owner/bookings", label: "Bookings", icon: "booking" },
+  { to: "/owner/finance", label: "Finance", icon: "finance" },
+  { to: "/owner/chat", label: "Messages", icon: "messages" },
+  { to: "/owner/settings", label: "Settings", icon: "settings" },
 ];
 
 export default function DashboardLayout() {
@@ -21,7 +26,7 @@ export default function DashboardLayout() {
       <aside className="w-64 bg-white border-r border-gray-200 shadow-sm overflow-y-auto">
         <div className="p-6">
           <Link
-            to="/"
+            to="/owner"
             className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition"
           >
             <span className="text-3xl">⚽</span>
@@ -56,7 +61,7 @@ export default function DashboardLayout() {
                   : "text-gray-700 hover:bg-gray-50"
               }`}
             >
-              <span className="text-lg">{item.icon}</span>
+              <Icon name={item.icon} className="w-8 h-8" />
               <span className="text-sm font-medium">{item.label}</span>
             </Link>
           ))}
